@@ -2,12 +2,12 @@ import random
 import time
 import collections
 import threading
-from concurrent.futures import ThreadPoolExecutor
 
 class Order:
-    def __init__(self, timestamp, order_id, price, quantity, side, order_type='limit', stop_price=None, displayed_quantity=None):
+    def __init__(self, timestamp, order_id, symbol, price, quantity, side, order_type='limit', stop_price=None, displayed_quantity=None):
         self.timestamp = timestamp
         self.order_id = order_id
+        self.symbol = symbol
         self.price = price
         self.quantity = quantity
         self.side = side
@@ -16,7 +16,7 @@ class Order:
         self.displayed_quantity = displayed_quantity if displayed_quantity else quantity
 
     def __repr__(self):
-        return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, price={self.price}, "
+        return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, symbol={self.symbol}, price={self.price}, "
                 f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, "
                 f"stop_price={self.stop_price}, displayed_quantity={self.displayed_quantity})")
 
@@ -41,6 +41,7 @@ class OrderBook:
         self.buy_orders = LockFreeQueue()
         self.sell_orders = LockFreeQueue()
         self.order_map = {}
+        self.order_history = []
 
     def add_order(self, order):
         if order.side == 'buy':
@@ -80,6 +81,15 @@ class OrderBook:
                     self.buy_orders.push(best_buy)
                 if best_sell.quantity > 0:
                     self.sell_orders.push(best_sell)
+
+                # Record matched order to history
+                self.order_history.append({
+                    'buy_order_id': best_buy.order_id,
+                    'sell_order_id': best_sell.order_id,
+                    'quantity': match_qty,
+                    'price': best_sell.price,
+                    'symbol': best_sell.symbol
+                })
             else:
                 self.buy_orders.push(best_buy)
                 self.sell_orders.push(best_sell)
@@ -101,8 +111,7 @@ class OrderBook:
         }
 
     def get_order_history(self):
-        # Dummy implementation
-        return []
+        return self.order_history
 
     def get_liquidity_pool(self):
         # Dummy implementation
@@ -110,17 +119,18 @@ class OrderBook:
 
 def generate_random_order(order_id):
     timestamp = int(time.time() * 1000)  # current time in milliseconds
-    price = random.randint(90, 110)
-    quantity = random.randint(1, 20)
+    symbol = random.choice(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'])
+    price = random.uniform(100, 1500) if symbol == 'TSLA' else random.uniform(50, 500)
+    quantity = random.randint(1, 100)
     side = random.choice(['buy', 'sell'])
     order_type = random.choice(['limit', 'market', 'iceberg', 'stop_loss', 'stop_limit'])
     stop_price = None
     displayed_quantity = None
     if order_type in ['stop_loss', 'stop_limit']:
-        stop_price = random.randint(85, 115)
+        stop_price = random.uniform(45, 1550)
     if order_type == 'iceberg':
         displayed_quantity = random.randint(1, quantity)
-    return Order(timestamp=timestamp, order_id=order_id, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
+    return Order(timestamp=timestamp, order_id=order_id, symbol=symbol, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
 
 def test_order_book():
     order_book = OrderBook()
@@ -129,7 +139,7 @@ def test_order_book():
     for i in range(10):
         order = generate_random_order(f'{i+1}')
         order_book.add_order(order)
-        print(f"Added {order.side} order: ID={order.order_id}, Price={order.price}, Quantity={order.quantity}")
+        print(f"Added {order.side} order: ID={order.order_id}, Symbol={order.symbol}, Price={order.price}, Quantity={order.quantity}")
 
     print("\nOrder Book Before Matching:")
     order_book_state = order_book.get_order_book()
@@ -146,6 +156,11 @@ def test_order_book():
     order_book_state = order_book.get_order_book()
     print("Buy Orders:", order_book_state['buy_orders'])
     print("Sell Orders:", order_book_state['sell_orders'])
+
+    print("\nOrder History:")
+    order_history = order_book.get_order_history()
+    for hist in order_history:
+        print(f"Symbol: {hist['symbol']}, Buy Order ID: {hist['buy_order_id']}, Sell Order ID: {hist['sell_order_id']}, Quantity: {hist['quantity']}, Price: {hist['price']}")
 
 # Main entry point for the test
 if __name__ == "__main__":

@@ -2,22 +2,26 @@ import tkinter as tk
 from tkinter import ttk
 import random
 import time
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from order import Order
 from order_book import OrderBook
+import threading
 
 def generate_random_order(order_id):
     timestamp = int(time.time() * 1000)  # current time in milliseconds
-    price = random.randint(90, 110)
-    quantity = random.randint(1, 20)
+    symbol = random.choice(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'])
+    price = random.uniform(100, 1500) if symbol == 'TSLA' else random.uniform(50, 500)
+    quantity = random.randint(1, 100)
     side = random.choice(['buy', 'sell'])
     order_type = random.choice(['limit', 'market', 'iceberg', 'stop_loss', 'stop_limit'])
     stop_price = None
     displayed_quantity = None
     if order_type in ['stop_loss', 'stop_limit']:
-        stop_price = random.randint(85, 115)
+        stop_price = random.uniform(45, 1550)
     if order_type == 'iceberg':
         displayed_quantity = random.randint(1, quantity)
-    return Order(timestamp=timestamp, order_id=order_id, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
+    return Order(timestamp=timestamp, order_id=order_id, symbol=symbol, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
 
 def update_gui():
     order_book.trigger_stop_orders()
@@ -27,48 +31,60 @@ def update_gui():
     buy_tree.delete(*buy_tree.get_children())
     sell_tree.delete(*sell_tree.get_children())
     history_tree.delete(*history_tree.get_children())
-    liquidity_tree.delete(*liquidity_tree.get_children())
 
-    # Insert buy orders with blue background
+    # Insert buy orders
     for order in order_book_state['buy_orders']:
         tags = ('buy',)
         if order.quantity > 10:
             tags = ('highlight', 'buy')
-        item_id = buy_tree.insert('', 'end', values=(order.order_id, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
-        if 'highlight' in tags:
-            flash_order(buy_tree, item_id, 'lightblue', 'yellow')
+        buy_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
 
-    # Insert sell orders with red background
+    # Insert sell orders
     for order in order_book_state['sell_orders']:
         tags = ('sell',)
         if order.quantity > 10:
             tags = ('highlight', 'sell')
-        item_id = sell_tree.insert('', 'end', values=(order.order_id, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
-        if 'highlight' in tags:
-            flash_order(sell_tree, item_id, 'lightcoral', 'yellow')
+        sell_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
 
     # Update order history
     order_history = order_book.get_order_history()
     for hist in order_history:
-        history_tree.insert('', 'end', values=hist)
-
-    # Update liquidity pool
-    liquidity_pool = order_book.get_liquidity_pool()
-    for price, liquidity in sorted(liquidity_pool.items()):
-        liquidity_tree.insert('', 'end', values=(price, liquidity['buy'], liquidity['sell']))
+        history_tree.insert('', 'end', values=(hist['buy_order_id'], hist['sell_order_id'], hist['symbol'], hist['quantity'], hist['price']))
 
     status_var.set("Order Book Updated")
+    update_chart()
 
-def flash_order(tree, item_id, color1, color2):
-    def toggle_color():
-        current_color = tree.item(item_id, "tags")[0]
-        new_color = 'highlight_alt' if current_color == 'highlight' else 'highlight'
-        tree.item(item_id, tags=(new_color,))
-        tree.tag_configure('highlight', background=color1)
-        tree.tag_configure('highlight_alt', background=color2)
-        tree.after(500, toggle_color)
-    
-    toggle_color()
+def update_chart():
+    buy_orders = order_book.get_order_book()['buy_orders']
+    sell_orders = order_book.get_order_book()['sell_orders']
+
+    buy_prices = [order.price for order in buy_orders]
+    buy_quantities = [order.quantity for order in buy_orders]
+    sell_prices = [order.price for order in sell_orders]
+    sell_quantities = [order.quantity for order in sell_orders]
+
+    ax.clear()
+
+    # Plot buy orders
+    for i in range(len(buy_prices)):
+        if i == 0:
+            ax.plot([buy_prices[i], buy_prices[i]], [0, buy_quantities[i]], color='green')
+        else:
+            ax.plot([buy_prices[i-1], buy_prices[i]], [buy_quantities[i-1], buy_quantities[i]], color='green')
+            ax.plot([buy_prices[i], buy_prices[i]], [buy_quantities[i-1], buy_quantities[i]], color='green')
+
+    # Plot sell orders
+    for i in range(len(sell_prices)):
+        if i == 0:
+            ax.plot([sell_prices[i], sell_prices[i]], [0, sell_quantities[i]], color='red')
+        else:
+            ax.plot([sell_prices[i-1], sell_prices[i]], [sell_quantities[i-1], sell_quantities[i]], color='red')
+            ax.plot([sell_prices[i], sell_prices[i]], [sell_quantities[i-1], sell_quantities[i]], color='red')
+
+    ax.set_xlabel('Price')
+    ax.set_ylabel('Quantity')
+    ax.set_title('Order Book Depth Chart')
+    chart_canvas.draw()
 
 def add_random_order():
     global order_id_counter
@@ -109,14 +125,14 @@ def search_orders(*args):
             tags = ('buy',)
             if order.quantity > 10:
                 tags = ('highlight', 'buy')
-            buy_tree.insert('', 'end', values=(order.order_id, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
+            buy_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
     
     for order in order_book.get_order_book()['sell_orders']:
         if query in order.order_id.lower() or query in str(order.price).lower():
             tags = ('sell',)
             if order.quantity > 10:
                 tags = ('highlight', 'sell')
-            sell_tree.insert('', 'end', values=(order.order_id, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
+            sell_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
 
 def sort_column(tree, col, reverse):
     l = [(tree.set(k, col), k) for k in tree.get_children('')]
@@ -126,6 +142,29 @@ def sort_column(tree, col, reverse):
         tree.move(k, '', index)
     
     tree.heading(col, command=lambda: sort_column(tree, col, not reverse))
+
+def open_chart_window():
+    chart_window = tk.Toplevel(root)
+    chart_window.title("Order Book Depth Chart")
+    chart_window.geometry("800x600")
+
+    global fig, ax, chart_canvas
+    fig, ax = plt.subplots()
+    chart_canvas = FigureCanvasTkAgg(fig, master=chart_window)
+    chart_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    update_chart()
+
+def start_market_simulation():
+    def simulate_market():
+        for _ in range(1000):  # Adjust this number as needed for stress testing
+            add_random_order()
+            if not running:
+                break
+            time.sleep(0.01)  # Adjust the speed of order generation
+
+    global running
+    running = True
+    threading.Thread(target=simulate_market).start()
 
 order_book = OrderBook()
 order_id_counter = 1
@@ -146,7 +185,7 @@ main_panedwindow.add(order_panedwindow)
 buy_tree_frame = tk.Frame(order_panedwindow)
 buy_tree_scroll = ttk.Scrollbar(buy_tree_frame, orient=tk.VERTICAL)
 buy_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-buy_tree = ttk.Treeview(buy_tree_frame, columns=("ID", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=buy_tree_scroll.set)
+buy_tree = ttk.Treeview(buy_tree_frame, columns=("ID", "Symbol", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=buy_tree_scroll.set)
 for col in buy_tree["columns"]:
     buy_tree.heading(col, text=col, command=lambda _col=col: sort_column(buy_tree, _col, False))
 buy_tree.tag_configure('buy', background='lightblue')
@@ -160,7 +199,7 @@ order_panedwindow.add(buy_tree_frame)
 sell_tree_frame = tk.Frame(order_panedwindow)
 sell_tree_scroll = ttk.Scrollbar(sell_tree_frame, orient=tk.VERTICAL)
 sell_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-sell_tree = ttk.Treeview(sell_tree_frame, columns=("ID", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=sell_tree_scroll.set)
+sell_tree = ttk.Treeview(sell_tree_frame, columns=("ID", "Symbol", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=sell_tree_scroll.set)
 for col in sell_tree["columns"]:
     sell_tree.heading(col, text=col, command=lambda _col=col: sort_column(sell_tree, _col, False))
 sell_tree.tag_configure('sell', background='lightcoral')
@@ -174,23 +213,12 @@ order_panedwindow.add(sell_tree_frame)
 history_tree_frame = tk.Frame(main_panedwindow)
 history_tree_scroll = ttk.Scrollbar(history_tree_frame, orient=tk.VERTICAL)
 history_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-history_tree = ttk.Treeview(history_tree_frame, columns=("Buy Order ID", "Sell Order ID", "Quantity", "Price"), show='headings', yscrollcommand=history_tree_scroll.set)
+history_tree = ttk.Treeview(history_tree_frame, columns=("Buy Order ID", "Sell Order ID", "Symbol", "Quantity", "Price"), show='headings', yscrollcommand=history_tree_scroll.set)
 for col in history_tree["columns"]:
     history_tree.heading(col, text=col, command=lambda _col=col: sort_column(history_tree, _col, False))
 history_tree.pack(fill=tk.BOTH, expand=True)
 history_tree_scroll.config(command=history_tree.yview)
 main_panedwindow.add(history_tree_frame)
-
-# Liquidity pool tree with scrollbar
-liquidity_tree_frame = tk.Frame(main_panedwindow)
-liquidity_tree_scroll = ttk.Scrollbar(liquidity_tree_frame, orient=tk.VERTICAL)
-liquidity_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-liquidity_tree = ttk.Treeview(liquidity_tree_frame, columns=("Price", "Buy Liquidity", "Sell Liquidity"), show='headings', yscrollcommand=liquidity_tree_scroll.set)
-for col in liquidity_tree["columns"]:
-    liquidity_tree.heading(col, text=col, command=lambda _col=col: sort_column(liquidity_tree, _col, False))
-liquidity_tree.pack(fill=tk.BOTH, expand=True)
-liquidity_tree_scroll.config(command=liquidity_tree.yview)
-main_panedwindow.add(liquidity_tree_frame)
 
 # Search bar
 search_var = tk.StringVar()
@@ -198,7 +226,6 @@ search_var.trace("w", search_orders)
 search_entry = tk.Entry(root, textvariable=search_var, width=50)
 search_entry.pack(padx=10, pady=10)
 
-# Create button frame at the bottom
 # Create button frame at the bottom
 button_frame = tk.Frame(root)
 button_frame.pack(fill=tk.X, padx=10, pady=10)
@@ -216,9 +243,15 @@ start_button.pack(side=tk.LEFT, padx=5)
 stop_button = tk.Button(button_frame, text="Stop Auto Update", command=stop_updates)
 stop_button.pack(side=tk.LEFT, padx=5)
 
+simulate_button = tk.Button(button_frame, text="Start Market Simulation", command=start_market_simulation)
+simulate_button.pack(side=tk.LEFT, padx=5)
+
 # Status label
 status_var = tk.StringVar()
 status_label = tk.Label(root, textvariable=status_var, bd=1, relief=tk.SUNKEN, anchor=tk.W)
 status_label.pack(fill=tk.X, side=tk.BOTTOM, ipady=2)
+
+# Open chart window
+open_chart_window()
 
 root.mainloop()
