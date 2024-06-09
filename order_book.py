@@ -13,7 +13,7 @@ class Order:
         self.side = side
         self.order_type = order_type
         self.stop_price = stop_price
-        self.displayed_quantity = displayed_quantity
+        self.displayed_quantity = displayed_quantity if displayed_quantity else quantity
 
     def __repr__(self):
         return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, price={self.price}, "
@@ -86,6 +86,10 @@ class OrderBook:
                 break
 
         return matched_orders
+
+    def trigger_stop_orders(self):
+        # Dummy implementation to trigger stop orders
+        print("Triggering stop orders...")
 
     def get_order_book(self):
         buy_orders = list(self.buy_orders.queue)

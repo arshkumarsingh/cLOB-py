@@ -222,4 +222,3 @@ status_label = tk.Label(root, textvariable=status_var, bd=1, relief=tk.SUNKEN, a
 status_label.pack(fill=tk.X, side=tk.BOTTOM, ipady=2)
 
 root.mainloop()
-
