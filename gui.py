@@ -8,7 +8,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, 
                              QComboBox, QSpinBox, QMessageBox, QSplitter)
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QMutex, QMutexLocker
 from order import Order
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 
@@ -20,6 +20,7 @@ class OrderBookGUI(QMainWindow):
         self.order_id_counter = 1
         self.symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA']
         self.current_prices = fetch_current_prices(self.symbols)
+        self.mutex = QMutex()
         self.init_ui()
         self.start_auto_update()
 
@@ -29,6 +30,10 @@ class OrderBookGUI(QMainWindow):
         main_layout = QVBoxLayout(central_widget)
         
         header_layout = QHBoxLayout()
+        self.symbol_input = QComboBox()
+        self.symbol_input.addItems(self.symbols)
+        header_layout.addWidget(QLabel("Symbol"))
+        header_layout.addWidget(self.symbol_input)
         self.price_label = QLabel("")
         self.price_label.setStyleSheet("font-size: 16px; color: red;")
         header_layout.addWidget(self.price_label)
@@ -173,7 +178,7 @@ class OrderBookGUI(QMainWindow):
             order = Order(
                 timestamp=timestamp,
                 order_id=self.order_id_input.text(),
-                symbol=self.symbols[0],  # Only using the first symbol for simplicity
+                symbol=self.symbol_input.currentText(),  # Get the selected symbol
                 price=float(self.price_input.text()),
                 quantity=self.quantity_input.value(),
                 side=self.side_input.currentText(),
@@ -213,8 +218,8 @@ class OrderBookGUI(QMainWindow):
             min_qty = self.min_qty_input.value()
             max_qty = self.max_qty_input.value()
             
-            filtered_buy_orders = [order for order in self.order_book.buy_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
-            filtered_sell_orders = [order for order in self.order_book.sell_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
+            filtered_buy_orders = [order for _, _, order in self.order_book.buy_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
+            filtered_sell_orders = [order for _, _, order in self.order_book.sell_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
             
             self.update_tree(self.buy_tree, filtered_buy_orders)
             self.update_tree(self.sell_tree, filtered_sell_orders)
@@ -250,22 +255,23 @@ class OrderBookGUI(QMainWindow):
             self.show_error("Failed to export to Excel", str(e))
 
     def generate_random_order(self):
-        symbol = self.symbols[0]  # Only using the first symbol for simplicity
+        symbol = self.symbol_input.currentText()  # Get the selected symbol
         current_price = self.current_prices[symbol]
         return generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
 
     def update_gui(self):
         try:
-            order_book_state = self.order_book.get_order_book()
-            
-            self.update_tree(self.buy_tree, order_book_state['buy_orders'])
-            self.update_tree(self.sell_tree, order_book_state['sell_orders'])
-            
-            self.update_stock_info()
-            self.update_statistics()
-            self.update_chart()
+            with QMutexLocker(self.mutex):
+                order_book_state = self.order_book.get_order_book()
 
-            self.status_label.setText("Order Book Updated")
+                self.update_tree(self.buy_tree, order_book_state['buy_orders'])
+                self.update_tree(self.sell_tree, order_book_state['sell_orders'])
+
+                self.update_stock_info()
+                self.update_statistics()
+                self.update_chart()
+
+                self.status_label.setText("Order Book Updated")
         except Exception as e:
             self.show_error("Failed to update GUI", str(e))
 
@@ -279,15 +285,15 @@ class OrderBookGUI(QMainWindow):
         if self.order_book.last_matched_price is not None:
             last_price = self.order_book.last_matched_price
             current_price = last_price
-            price_change = current_price - self.current_prices[self.symbols[0]]
-            percent_change = (price_change / self.current_prices[self.symbols[0]]) * 100
+            price_change = current_price - self.current_prices[self.symbol_input.currentText()]
+            percent_change = (price_change / self.current_prices[self.symbol_input.currentText()]) * 100
             self.price_label.setText(f"{current_price:.2f}  {price_change:.2f} ({percent_change:.2f}%)")
             self.price_label.setStyleSheet("color: green;" if price_change >= 0 else "color: red;")
-            self.current_prices[self.symbols[0]] = current_price
+            self.current_prices[self.symbol_input.currentText()] = current_price
 
     def update_statistics(self):
-        buy_orders = self.order_book.buy_orders
-        sell_orders = self.order_book.sell_orders
+        buy_orders = [order for _, _, order in self.order_book.buy_orders]
+        sell_orders = [order for _, _, order in self.order_book.sell_orders]
 
         total_buy_orders = len(buy_orders)
         total_sell_orders = len(sell_orders)
@@ -300,14 +306,20 @@ class OrderBookGUI(QMainWindow):
         self.avg_sell_price_label.setText(f"{avg_sell_price:.2f}")
 
     def update_chart(self):
-        buy_orders = self.order_book.buy_orders
-        sell_orders = self.order_book.sell_orders
+        try:
+            buy_orders = [order for _, _, order in self.order_book.buy_orders]
+            sell_orders = [order for _, _, order in self.order_book.sell_orders]
 
-        buy_prices = [order.price for order in buy_orders]
-        buy_quantities = [order.quantity for order in buy_orders]
-        sell_prices = [order.price for order in sell_orders]
-        sell_quantities = [order.quantity for order in sell_orders]
+            buy_prices = [order.price for order in buy_orders]
+            buy_quantities = [order.quantity for order in buy_orders]
+            sell_prices = [order.price for order in sell_orders]
+            sell_quantities = [order.quantity for order in sell_orders]
 
+            self.plot_orders(buy_prices, buy_quantities, sell_prices, sell_quantities)
+        except Exception as e:
+            self.show_error("Failed to update chart", str(e))
+
+    def plot_orders(self, buy_prices, buy_quantities, sell_prices, sell_quantities):
         self.ax.clear()
         self.ax.bar(buy_prices, buy_quantities, color='green', label='Buy Orders')
         self.ax.bar(sell_prices, sell_quantities, color='red', label='Sell Orders')
