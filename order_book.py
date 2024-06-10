@@ -1,10 +1,8 @@
 import random
 import time
-import collections
-import threading
 
 class Order:
-    def __init__(self, timestamp, order_id, symbol, price, quantity, side, order_type='limit', stop_price=None, displayed_quantity=None):
+    def __init__(self, timestamp, order_id, symbol, price, quantity, side, order_type):
         self.timestamp = timestamp
         self.order_id = order_id
         self.symbol = symbol
@@ -12,156 +10,79 @@ class Order:
         self.quantity = quantity
         self.side = side
         self.order_type = order_type
-        self.stop_price = stop_price
-        self.displayed_quantity = displayed_quantity if displayed_quantity else quantity
-
-    def __repr__(self):
-        return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, symbol={self.symbol}, price={self.price}, "
-                f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, "
-                f"stop_price={self.stop_price}, displayed_quantity={self.displayed_quantity})")
-
-class LockFreeQueue:
-    def __init__(self):
-        self.queue = collections.deque()
-        self.lock = threading.Lock()
-
-    def push(self, item):
-        with self.lock:
-            self.queue.append(item)
-
-    def pop(self):
-        with self.lock:
-            if len(self.queue) > 0:
-                return self.queue.popleft()
-            else:
-                return None
 
 class OrderBook:
     def __init__(self):
-        self.buy_orders = LockFreeQueue()
-        self.sell_orders = LockFreeQueue()
-        self.order_map = {}
+        self.buy_orders = []
+        self.sell_orders = []
         self.order_history = []
+        self.last_matched_price = None
 
     def add_order(self, order):
-        if order.side == 'buy':
-            self.buy_orders.push(order)
+        if order.side == "buy":
+            self.buy_orders.append(order)
+            self.buy_orders.sort(key=lambda x: (-x.price, x.timestamp))
         else:
-            self.sell_orders.push(order)
-        self.order_map[order.order_id] = order
+            self.sell_orders.append(order)
+            self.sell_orders.sort(key=lambda x: (x.price, x.timestamp))
 
-    def remove_order(self, order_id):
-        order = self.order_map.pop(order_id, None)
-        if not order:
-            return False
-        # Simplified logic for removing order from LockFreeQueue
-        return True
+    def cancel_order(self, order_id):
+        for order_list in [self.buy_orders, self.sell_orders]:
+            for order in order_list:
+                if order.order_id == order_id:
+                    order_list.remove(order)
+                    return f"Order {order_id} cancelled."
+        return f"Order {order_id} not found."
 
     def match_orders(self):
-        matched_orders = []
-        while True:
-            best_buy = self.buy_orders.pop()
-            best_sell = self.sell_orders.pop()
+        matched = []
+        while self.buy_orders and self.sell_orders and self.buy_orders[0].price >= self.sell_orders[0].price:
+            buy_order = self.buy_orders[0]
+            sell_order = self.sell_orders[0]
+            matched_quantity = min(buy_order.quantity, sell_order.quantity)
 
-            if not best_buy or not best_sell:
-                if best_buy:
-                    self.buy_orders.push(best_buy)
-                if best_sell:
-                    self.sell_orders.push(best_sell)
-                break
+            buy_order.quantity -= matched_quantity
+            sell_order.quantity -= matched_quantity
 
-            if best_buy.price >= best_sell.price:
-                match_qty = min(best_buy.quantity, best_sell.quantity)
-                matched_orders.append((best_buy, best_sell, match_qty))
+            self.order_history.append({
+                "buy_order_id": buy_order.order_id,
+                "sell_order_id": sell_order.order_id,
+                "symbol": buy_order.symbol,
+                "quantity": matched_quantity,
+                "price": sell_order.price,
+                "timestamp": int(time.time())
+            })
 
-                best_buy.quantity -= match_qty
-                best_sell.quantity -= match_qty
+            self.last_matched_price = sell_order.price
 
-                if best_buy.quantity > 0:
-                    self.buy_orders.push(best_buy)
-                if best_sell.quantity > 0:
-                    self.sell_orders.push(best_sell)
+            if buy_order.quantity == 0:
+                self.buy_orders.pop(0)
+            if sell_order.quantity == 0:
+                self.sell_orders.pop(0)
 
-                # Record matched order to history
-                self.order_history.append({
-                    'buy_order_id': best_buy.order_id,
-                    'sell_order_id': best_sell.order_id,
-                    'quantity': match_qty,
-                    'price': best_sell.price,
-                    'symbol': best_sell.symbol
-                })
-            else:
-                self.buy_orders.push(best_buy)
-                self.sell_orders.push(best_sell)
-                break
+            matched.append((buy_order, sell_order, matched_quantity))
 
-        return matched_orders
-
-    def trigger_stop_orders(self):
-        # Dummy implementation to trigger stop orders
-        print("Triggering stop orders...")
+        return matched
 
     def get_order_book(self):
-        buy_orders = list(self.buy_orders.queue)
-        sell_orders = list(self.sell_orders.queue)
-
         return {
-            'buy_orders': sorted(buy_orders, key=lambda x: (-x.price, x.timestamp)),
-            'sell_orders': sorted(sell_orders, key=lambda x: (x.price, x.timestamp))
+            "buy_orders": self.buy_orders,
+            "sell_orders": self.sell_orders
         }
 
     def get_order_history(self):
         return self.order_history
 
-    def get_liquidity_pool(self):
-        # Dummy implementation
-        return {}
+def fetch_current_prices(symbols):
+    prices = {}
+    for symbol in symbols:
+        prices[symbol] = random.uniform(100, 500)
+    return prices
 
-def generate_random_order(order_id):
-    timestamp = int(time.time() * 1000)  # current time in milliseconds
-    symbol = random.choice(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'])
-    price = random.uniform(100, 1500) if symbol == 'TSLA' else random.uniform(50, 500)
+def generate_realistic_order(order_id, symbol, current_price):
+    side = random.choice(["buy", "sell"])
+    price = current_price * random.uniform(0.95, 1.05)
     quantity = random.randint(1, 100)
-    side = random.choice(['buy', 'sell'])
-    order_type = random.choice(['limit', 'market', 'iceberg', 'stop_loss', 'stop_limit'])
-    stop_price = None
-    displayed_quantity = None
-    if order_type in ['stop_loss', 'stop_limit']:
-        stop_price = random.uniform(45, 1550)
-    if order_type == 'iceberg':
-        displayed_quantity = random.randint(1, quantity)
-    return Order(timestamp=timestamp, order_id=order_id, symbol=symbol, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
-
-def test_order_book():
-    order_book = OrderBook()
-
-    # Generate random orders
-    for i in range(10):
-        order = generate_random_order(f'{i+1}')
-        order_book.add_order(order)
-        print(f"Added {order.side} order: ID={order.order_id}, Symbol={order.symbol}, Price={order.price}, Quantity={order.quantity}")
-
-    print("\nOrder Book Before Matching:")
-    order_book_state = order_book.get_order_book()
-    print("Buy Orders:", order_book_state['buy_orders'])
-    print("Sell Orders:", order_book_state['sell_orders'])
-
-    matched_orders = order_book.match_orders()
-
-    print("\nMatched Orders:")
-    for buy, sell, qty in matched_orders:
-        print(f"Matched {qty} units between buy order {buy.order_id} and sell order {sell.order_id}")
-
-    print("\nOrder Book After Matching:")
-    order_book_state = order_book.get_order_book()
-    print("Buy Orders:", order_book_state['buy_orders'])
-    print("Sell Orders:", order_book_state['sell_orders'])
-
-    print("\nOrder History:")
-    order_history = order_book.get_order_history()
-    for hist in order_history:
-        print(f"Symbol: {hist['symbol']}, Buy Order ID: {hist['buy_order_id']}, Sell Order ID: {hist['sell_order_id']}, Quantity: {hist['quantity']}, Price: {hist['price']}")
-
-# Main entry point for the test
-if __name__ == "__main__":
-    test_order_book()
+    order_type = random.choice(["limit", "market"])
+    timestamp = int(time.time() * 1000)
+    return Order(timestamp, order_id, symbol, price, quantity, side, order_type)

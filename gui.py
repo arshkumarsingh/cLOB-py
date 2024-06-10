@@ -1,257 +1,386 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import random
 import time
+import threading
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from order import Order
-from order_book import OrderBook
-import threading
+from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 
-def generate_random_order(order_id):
-    timestamp = int(time.time() * 1000)  # current time in milliseconds
-    symbol = random.choice(['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'])
-    price = random.uniform(100, 1500) if symbol == 'TSLA' else random.uniform(50, 500)
-    quantity = random.randint(1, 100)
-    side = random.choice(['buy', 'sell'])
-    order_type = random.choice(['limit', 'market', 'iceberg', 'stop_loss', 'stop_limit'])
-    stop_price = None
-    displayed_quantity = None
-    if order_type in ['stop_loss', 'stop_limit']:
-        stop_price = random.uniform(45, 1550)
-    if order_type == 'iceberg':
-        displayed_quantity = random.randint(1, quantity)
-    return Order(timestamp=timestamp, order_id=order_id, symbol=symbol, price=price, quantity=quantity, side=side, order_type=order_type, stop_price=stop_price, displayed_quantity=displayed_quantity)
+class OrderBookGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Order Book Ladder")
+        self.order_book = OrderBook()
+        self.order_id_counter = 1
+        self.symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA']
+        self.selected_symbol = tk.StringVar(value=self.symbols[0])
+        self.current_prices = fetch_current_prices(self.symbols)
+        self.setup_ui()
+        self.start_auto_update()
 
-def update_gui():
-    order_book.trigger_stop_orders()
-    order_book_state = order_book.get_order_book()
-    
-    # Clear existing entries
-    buy_tree.delete(*buy_tree.get_children())
-    sell_tree.delete(*sell_tree.get_children())
-    history_tree.delete(*history_tree.get_children())
+    def setup_ui(self):
+        main_frame = tk.Frame(self.root, bg="black")
+        main_frame.pack(fill=tk.BOTH, expand=True)
 
-    # Insert buy orders
-    for order in order_book_state['buy_orders']:
-        tags = ('buy',)
-        if order.quantity > 10:
-            tags = ('highlight', 'buy')
-        buy_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
+        header_frame = tk.Frame(main_frame, bg="black")
+        header_frame.pack(fill=tk.X)
 
-    # Insert sell orders
-    for order in order_book_state['sell_orders']:
-        tags = ('sell',)
-        if order.quantity > 10:
-            tags = ('highlight', 'sell')
-        sell_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
+        self.price_label = tk.Label(header_frame, text="", font=("Arial", 16), fg="red", bg="black")
+        self.price_label.pack(pady=5)
 
-    # Update order history
-    order_history = order_book.get_order_history()
-    for hist in order_history:
-        history_tree.insert('', 'end', values=(hist['buy_order_id'], hist['sell_order_id'], hist['symbol'], hist['quantity'], hist['price']))
+        order_panedwindow = tk.PanedWindow(main_frame, orient=tk.HORIZONTAL, bg="black")
+        order_panedwindow.pack(fill=tk.BOTH, expand=True)
 
-    status_var.set("Order Book Updated")
-    update_chart()
+        self.buy_frame, self.buy_tree = self.create_treeview(order_panedwindow, "Buy Orders", 'lightblue')
+        self.sell_frame, self.sell_tree = self.create_treeview(order_panedwindow, "Sell Orders", 'lightcoral')
+        
+        order_panedwindow.add(self.buy_frame)
+        order_panedwindow.add(self.sell_frame)
 
-def update_chart():
-    buy_orders = order_book.get_order_book()['buy_orders']
-    sell_orders = order_book.get_order_book()['sell_orders']
+        bottom_frame = tk.Frame(main_frame, bg="black")
+        bottom_frame.pack(fill=tk.X, pady=10)
 
-    buy_prices = [order.price for order in buy_orders]
-    buy_quantities = [order.quantity for order in buy_orders]
-    sell_prices = [order.price for order in sell_orders]
-    sell_quantities = [order.quantity for order in sell_orders]
+        day_range_label = tk.Label(bottom_frame, text="Day's range", font=("Arial", 12), fg="white", bg="black")
+        day_range_label.grid(row=0, column=0, padx=10)
 
-    ax.clear()
+        self.low_label = tk.Label(bottom_frame, text="", font=("Arial", 12), fg="white", bg="black")
+        self.low_label.grid(row=0, column=1, padx=10)
 
-    # Plot buy orders
-    for i in range(len(buy_prices)):
-        if i == 0:
-            ax.plot([buy_prices[i], buy_prices[i]], [0, buy_quantities[i]], color='green')
-        else:
-            ax.plot([buy_prices[i-1], buy_prices[i]], [buy_quantities[i-1], buy_quantities[i]], color='green')
-            ax.plot([buy_prices[i], buy_prices[i]], [buy_quantities[i-1], buy_quantities[i]], color='green')
+        self.high_label = tk.Label(bottom_frame, text="", font=("Arial", 12), fg="white", bg="black")
+        self.high_label.grid(row=0, column=2, padx=10)
 
-    # Plot sell orders
-    for i in range(len(sell_prices)):
-        if i == 0:
-            ax.plot([sell_prices[i], sell_prices[i]], [0, sell_quantities[i]], color='red')
-        else:
-            ax.plot([sell_prices[i-1], sell_prices[i]], [sell_quantities[i-1], sell_quantities[i]], color='red')
-            ax.plot([sell_prices[i], sell_prices[i]], [sell_quantities[i-1], sell_quantities[i]], color='red')
+        self.open_label = tk.Label(bottom_frame, text="", font=("Arial", 12), fg="white", bg="black")
+        self.open_label.grid(row=0, column=3, padx=10)
 
-    ax.set_xlabel('Price')
-    ax.set_ylabel('Quantity')
-    ax.set_title('Order Book Depth Chart')
-    chart_canvas.draw()
+        self.prev_close_label = tk.Label(bottom_frame, text="", font=("Arial", 12), fg="white", bg="black")
+        self.prev_close_label.grid(row=0, column=4, padx=10)
 
-def add_random_order():
-    global order_id_counter
-    order = generate_random_order(f'{order_id_counter}')
-    order_book.add_order(order)
-    order_id_counter += 1
-    update_gui()
+        self.create_button_frame(main_frame)
+        self.create_order_form(main_frame)
 
-def match_orders():
-    order_book.match_orders()
-    update_gui()
+        self.status_var = tk.StringVar()
+        status_label = tk.Label(main_frame, textvariable=self.status_var, bd=1, relief=tk.SUNKEN, anchor=tk.W, bg="black", fg="white")
+        status_label.pack(fill=tk.X, side=tk.BOTTOM, ipady=2)
 
-def start_updates():
-    global running
-    running = True
-    update_orders()
-    status_var.set("Auto Update Started")
+        self.create_filter_frame(main_frame)
+        self.create_statistics_frame(main_frame)
+        self.create_chart_frame(main_frame)
 
-def stop_updates():
-    global running
-    running = False
-    status_var.set("Auto Update Stopped")
+    def create_treeview(self, parent, label, color=None):
+        frame = tk.Frame(parent, bg="black")
+        scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        tree = ttk.Treeview(frame, columns=("Price", "Orders", "Qty"), show='headings', yscrollcommand=scroll.set)
+        for col in tree["columns"]:
+            tree.heading(col, text=col, command=lambda _col=col: self.sort_column(tree, _col, False))
+        if color:
+            tree.tag_configure('highlight', background='yellow')
+            tree.tag_configure('highlight_alt', background='orange')
+            tree.tag_configure('color', background=color)
+        tree.pack(fill=tk.BOTH, expand=True)
+        scroll.config(command=tree.yview)
+        frame.pack(fill=tk.BOTH, expand=True)
+        return frame, tree
 
-def update_orders():
-    if running:
-        add_random_order()
-        root.after(1000, update_orders)
+    def create_button_frame(self, parent):
+        frame = tk.Frame(parent, bg="black")
+        frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        buttons = [
+            ("Add Random Order", self.add_random_order),
+            ("Match Orders", self.match_orders),
+            ("Cancel Order", self.cancel_order),
+            ("Export to Excel", self.export_to_excel)
+        ]
+        
+        for text, command in buttons:
+            button = tk.Button(frame, text=text, command=command, font=("Arial", 12), bg="grey", fg="white")
+            button.pack(side=tk.LEFT, padx=5)
+        
+        return frame
 
-def search_orders(*args):
-    query = search_var.get().lower()
-    for item in buy_tree.get_children():
-        buy_tree.delete(item)
-    for item in sell_tree.get_children():
-        sell_tree.delete(item)
-    
-    for order in order_book.get_order_book()['buy_orders']:
-        if query in order.order_id.lower() or query in str(order.price).lower():
-            tags = ('buy',)
+    def create_order_form(self, parent):
+        frame = tk.Frame(parent, bg="black")
+        frame.pack(fill=tk.X, padx=10, pady=10)
+
+        tk.Label(frame, text="Order ID", fg="white", bg="black").grid(row=0, column=0)
+        self.order_id_var = tk.StringVar()
+        tk.Entry(frame, textvariable=self.order_id_var).grid(row=0, column=1)
+
+        tk.Label(frame, text="Price", fg="white", bg="black").grid(row=0, column=2)
+        self.price_var = tk.DoubleVar()
+        tk.Entry(frame, textvariable=self.price_var).grid(row=0, column=3)
+
+        tk.Label(frame, text="Quantity", fg="white", bg="black").grid(row=0, column=4)
+        self.quantity_var = tk.IntVar()
+        tk.Entry(frame, textvariable=self.quantity_var).grid(row=0, column=5)
+
+        tk.Label(frame, text="Side", fg="white", bg="black").grid(row=1, column=0)
+        self.side_var = tk.StringVar(value="buy")
+        tk.OptionMenu(frame, self.side_var, "buy", "sell").grid(row=1, column=1)
+
+        tk.Label(frame, text="Type", fg="white", bg="black").grid(row=1, column=2)
+        self.type_var = tk.StringVar(value="limit")
+        tk.OptionMenu(frame, self.type_var, "limit", "market").grid(row=1, column=3)
+
+        tk.Button(frame, text="Add Order", command=self.add_manual_order, bg="grey", fg="white").grid(row=1, column=4, padx=5)
+        tk.Button(frame, text="Cancel Order", command=self.cancel_order, bg="grey", fg="white").grid(row=1, column=5, padx=5)
+
+    def create_filter_frame(self, parent):
+        frame = tk.Frame(parent, bg="black")
+        frame.pack(fill=tk.X, padx=10, pady=10)
+
+        tk.Label(frame, text="Filter Orders", font=("Arial", 12), fg="white", bg="black").grid(row=0, column=0, columnspan=4)
+
+        tk.Label(frame, text="Min Price", fg="white", bg="black").grid(row=1, column=0)
+        self.min_price_var = tk.DoubleVar()
+        tk.Entry(frame, textvariable=self.min_price_var).grid(row=1, column=1)
+
+        tk.Label(frame, text="Max Price", fg="white", bg="black").grid(row=1, column=2)
+        self.max_price_var = tk.DoubleVar()
+        tk.Entry(frame, textvariable=self.max_price_var).grid(row=1, column=3)
+
+        tk.Label(frame, text="Min Quantity", fg="white", bg="black").grid(row=2, column=0)
+        self.min_qty_var = tk.IntVar()
+        tk.Entry(frame, textvariable=self.min_qty_var).grid(row=2, column=1)
+
+        tk.Label(frame, text="Max Quantity", fg="white", bg="black").grid(row=2, column=2)
+        self.max_qty_var = tk.IntVar()
+        tk.Entry(frame, textvariable=self.max_qty_var).grid(row=2, column=3)
+
+        tk.Button(frame, text="Apply Filter", command=self.apply_filter, bg="grey", fg="white").grid(row=3, column=0, columnspan=4, pady=5)
+
+    def create_statistics_frame(self, parent):
+        frame = tk.Frame(parent, bg="black")
+        frame.pack(fill=tk.X, padx=10, pady=10)
+
+        tk.Label(frame, text="Order Statistics", font=("Arial", 12), fg="white", bg="black").grid(row=0, column=0, columnspan=2)
+
+        tk.Label(frame, text="Total Buy Orders", fg="white", bg="black").grid(row=1, column=0, sticky="w")
+        self.total_buy_orders_label = tk.Label(frame, text="0", fg="white", bg="black")
+        self.total_buy_orders_label.grid(row=1, column=1, sticky="w")
+
+        tk.Label(frame, text="Total Sell Orders", fg="white", bg="black").grid(row=2, column=0, sticky="w")
+        self.total_sell_orders_label = tk.Label(frame, text="0", fg="white", bg="black")
+        self.total_sell_orders_label.grid(row=2, column=1, sticky="w")
+
+        tk.Label(frame, text="Average Buy Price", fg="white", bg="black").grid(row=3, column=0, sticky="w")
+        self.avg_buy_price_label = tk.Label(frame, text="0.00", fg="white", bg="black")
+        self.avg_buy_price_label.grid(row=3, column=1, sticky="w")
+
+        tk.Label(frame, text="Average Sell Price", fg="white", bg="black").grid(row=4, column=0, sticky="w")
+        self.avg_sell_price_label = tk.Label(frame, text="0.00", fg="white", bg="black")
+        self.avg_sell_price_label.grid(row=4, column=1, sticky="w")
+
+    def create_chart_frame(self, parent):
+        frame = tk.Frame(parent, bg="black")
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(frame, text="Order Distribution", font=("Arial", 12), fg="white", bg="black").pack()
+
+        self.fig, self.ax = plt.subplots()
+        self.chart_canvas = FigureCanvasTkAgg(self.fig, master=frame)
+        self.chart_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+    def generate_random_order(self):
+        symbol = self.selected_symbol.get()
+        current_price = self.current_prices[symbol]
+        return generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
+
+    def add_manual_order(self):
+        try:
+            timestamp = int(time.time() * 1000)
+            order = Order(
+                timestamp=timestamp,
+                order_id=self.order_id_var.get(),
+                symbol=self.selected_symbol.get(),
+                price=self.price_var.get(),
+                quantity=self.quantity_var.get(),
+                side=self.side_var.get(),
+                order_type=self.type_var.get()
+            )
+            self.order_book.add_order(order)
+            self.order_id_counter += 1
+            self.update_gui()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to add manual order: {e}")
+
+    def cancel_order(self):
+        try:
+            order_id = self.order_id_var.get()
+            result = self.order_book.cancel_order(order_id)
+            messagebox.showinfo("Cancel Order", result)
+            self.update_gui()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to cancel order: {e}")
+
+    def update_gui(self):
+        try:
+            order_book_state = self.order_book.get_order_book()
+            
+            self.update_tree(self.buy_tree, order_book_state['buy_orders'])
+            self.update_tree(self.sell_tree, order_book_state['sell_orders'])
+            
+            self.update_stock_info()
+            self.update_statistics()
+            self.update_chart()
+
+            self.status_var.set("Order Book Updated")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to update GUI: {e}")
+
+    def update_tree(self, tree, orders):
+        tree.delete(*tree.get_children())
+        for order in orders:
+            tags = ('color',)
             if order.quantity > 10:
-                tags = ('highlight', 'buy')
-            buy_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
-    
-    for order in order_book.get_order_book()['sell_orders']:
-        if query in order.order_id.lower() or query in str(order.price).lower():
-            tags = ('sell',)
-            if order.quantity > 10:
-                tags = ('highlight', 'sell')
-            sell_tree.insert('', 'end', values=(order.order_id, order.symbol, order.price, order.quantity, order.order_type, order.displayed_quantity), tags=tags)
+                tags = ('highlight', 'color')
+            tree.insert('', 'end', values=(order.price, len(orders), order.quantity), tags=tags)
 
-def sort_column(tree, col, reverse):
-    l = [(tree.set(k, col), k) for k in tree.get_children('')]
-    l.sort(reverse=reverse)
-    
-    for index, (val, k) in enumerate(l):
-        tree.move(k, '', index)
-    
-    tree.heading(col, command=lambda: sort_column(tree, col, not reverse))
+    def update_stock_info(self):
+        if self.order_book.last_matched_price is not None:
+            last_price = self.order_book.last_matched_price
+            current_price = last_price
+            price_change = current_price - self.current_prices[self.selected_symbol.get()]
+            percent_change = (price_change / self.current_prices[self.selected_symbol.get()]) * 100
+            self.price_label.config(text=f"{current_price:.2f}  {price_change:.2f} ({percent_change:.2f}%)", fg="green" if price_change >= 0 else "red")
+            self.current_prices[self.selected_symbol.get()] = current_price
 
-def open_chart_window():
-    chart_window = tk.Toplevel(root)
-    chart_window.title("Order Book Depth Chart")
-    chart_window.geometry("800x600")
+    def apply_filter(self):
+        min_price = self.min_price_var.get()
+        max_price = self.max_price_var.get()
+        min_qty = self.min_qty_var.get()
+        max_qty = self.max_qty_var.get()
 
-    global fig, ax, chart_canvas
-    fig, ax = plt.subplots()
-    chart_canvas = FigureCanvasTkAgg(fig, master=chart_window)
-    chart_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-    update_chart()
+        filtered_buy_orders = [order for order in self.order_book.buy_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
+        filtered_sell_orders = [order for order in self.order_book.sell_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
 
-def start_market_simulation():
-    def simulate_market():
-        for _ in range(1000):  # Adjust this number as needed for stress testing
-            add_random_order()
-            if not running:
-                break
-            time.sleep(0.01)  # Adjust the speed of order generation
+        self.update_tree(self.buy_tree, filtered_buy_orders)
+        self.update_tree(self.sell_tree, filtered_sell_orders)
 
-    global running
-    running = True
-    threading.Thread(target=simulate_market).start()
+    def update_statistics(self):
+        buy_orders = self.order_book.buy_orders
+        sell_orders = self.order_book.sell_orders
 
-order_book = OrderBook()
-order_id_counter = 1
-running = False
+        total_buy_orders = len(buy_orders)
+        total_sell_orders = len(sell_orders)
+        avg_buy_price = sum(order.price for order in buy_orders) / total_buy_orders if total_buy_orders else 0
+        avg_sell_price = sum(order.price for order in sell_orders) / total_sell_orders if total_sell_orders else 0
 
-root = tk.Tk()
-root.title("Order Book Ladder")
+        self.total_buy_orders_label.config(text=str(total_buy_orders))
+        self.total_sell_orders_label.config(text=str(total_sell_orders))
+        self.avg_buy_price_label.config(text=f"{avg_buy_price:.2f}")
+        self.avg_sell_price_label.config(text=f"{avg_sell_price:.2f}")
 
-# Create a vertical PanedWindow for the main content
-main_panedwindow = tk.PanedWindow(root, orient=tk.VERTICAL)
-main_panedwindow.pack(fill=tk.BOTH, expand=True)
+    def update_chart(self):
+        buy_orders = self.order_book.buy_orders
+        sell_orders = self.order_book.sell_orders
 
-# Create horizontal PanedWindow for the order books
-order_panedwindow = tk.PanedWindow(main_panedwindow, orient=tk.HORIZONTAL)
-main_panedwindow.add(order_panedwindow)
+        buy_prices = [order.price for order in buy_orders]
+        buy_quantities = [order.quantity for order in buy_orders]
+        sell_prices = [order.price for order in sell_orders]
+        sell_quantities = [order.quantity for order in sell_orders]
 
-# Buy orders tree with scrollbar
-buy_tree_frame = tk.Frame(order_panedwindow)
-buy_tree_scroll = ttk.Scrollbar(buy_tree_frame, orient=tk.VERTICAL)
-buy_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-buy_tree = ttk.Treeview(buy_tree_frame, columns=("ID", "Symbol", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=buy_tree_scroll.set)
-for col in buy_tree["columns"]:
-    buy_tree.heading(col, text=col, command=lambda _col=col: sort_column(buy_tree, _col, False))
-buy_tree.tag_configure('buy', background='lightblue')
-buy_tree.tag_configure('highlight', background='yellow')
-buy_tree.tag_configure('highlight_alt', background='orange')
-buy_tree.pack(fill=tk.BOTH, expand=True)
-buy_tree_scroll.config(command=buy_tree.yview)
-order_panedwindow.add(buy_tree_frame)
+        self.ax.clear()
+        self.ax.bar(buy_prices, buy_quantities, color='green', label='Buy Orders')
+        self.ax.bar(sell_prices, sell_quantities, color='red', label='Sell Orders')
+        self.ax.set_xlabel('Price')
+        self.ax.set_ylabel('Quantity')
+        self.ax.set_title('Order Distribution')
+        self.ax.legend()
+        self.chart_canvas.draw()
 
-# Sell orders tree with scrollbar
-sell_tree_frame = tk.Frame(order_panedwindow)
-sell_tree_scroll = ttk.Scrollbar(sell_tree_frame, orient=tk.VERTICAL)
-sell_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-sell_tree = ttk.Treeview(sell_tree_frame, columns=("ID", "Symbol", "Price", "Quantity", "Type", "Displayed Quantity"), show='headings', yscrollcommand=sell_tree_scroll.set)
-for col in sell_tree["columns"]:
-    sell_tree.heading(col, text=col, command=lambda _col=col: sort_column(sell_tree, _col, False))
-sell_tree.tag_configure('sell', background='lightcoral')
-sell_tree.tag_configure('highlight', background='yellow')
-sell_tree.tag_configure('highlight_alt', background='orange')
-sell_tree.pack(fill=tk.BOTH, expand=True)
-sell_tree_scroll.config(command=sell_tree.yview)
-order_panedwindow.add(sell_tree_frame)
+    def add_random_order(self):
+        try:
+            order = self.generate_random_order()
+            self.order_book.add_order(order)
+            self.order_id_counter += 1
+            self.update_gui()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to add random order: {e}")
 
-# Order history tree with scrollbar
-history_tree_frame = tk.Frame(main_panedwindow)
-history_tree_scroll = ttk.Scrollbar(history_tree_frame, orient=tk.VERTICAL)
-history_tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-history_tree = ttk.Treeview(history_tree_frame, columns=("Buy Order ID", "Sell Order ID", "Symbol", "Quantity", "Price"), show='headings', yscrollcommand=history_tree_scroll.set)
-for col in history_tree["columns"]:
-    history_tree.heading(col, text=col, command=lambda _col=col: sort_column(history_tree, _col, False))
-history_tree.pack(fill=tk.BOTH, expand=True)
-history_tree_scroll.config(command=history_tree.yview)
-main_panedwindow.add(history_tree_frame)
+    def match_orders(self):
+        try:
+            matched = self.order_book.match_orders()
+            if not matched:
+                print("No orders matched.")
+            else:
+                for buy, sell, qty in matched:
+                    print(f"Matched {qty} units between buy order {buy.order_id} and sell order {sell.order_id}")
+            self.update_gui()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to match orders: {e}")
 
-# Search bar
-search_var = tk.StringVar()
-search_var.trace("w", search_orders)
-search_entry = tk.Entry(root, textvariable=search_var, width=50)
-search_entry.pack(padx=10, pady=10)
+    def search_orders(self, *args):
+        try:
+            query = self.search_var.get().lower()
+            self.filter_tree(self.buy_tree, self.order_book.get_order_book()['buy_orders'], query)
+            self.filter_tree(self.sell_tree, self.order_book.get_order_book()['sell_orders'], query)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to search orders: {e}")
 
-# Create button frame at the bottom
-button_frame = tk.Frame(root)
-button_frame.pack(fill=tk.X, padx=10, pady=10)
+    def filter_tree(self, tree, orders, query):
+        tree.delete(*tree.get_children())
+        for order in orders:
+            if query in order.order_id.lower() or query in str(order.price).lower():
+                tags = ('color',)
+                if order.quantity > 10:
+                    tags = ('highlight', 'color')
+                tree.insert('', 'end', values=(order.price, len(orders), order.quantity), tags=tags)
 
-# Add buttons
-add_order_button = tk.Button(button_frame, text="Add Random Order", command=add_random_order)
-add_order_button.pack(side=tk.LEFT, padx=5)
+    def sort_column(self, tree, col, reverse):
+        try:
+            l = [(tree.set(k, col), k) for k in tree.get_children('')]
+            l.sort(reverse=reverse)
+            
+            for index, (val, k) in enumerate(l):
+                tree.move(k, '', index)
+            
+            tree.heading(col, command=lambda: self.sort_column(tree, col, not reverse))
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to sort column: {e}")
 
-match_orders_button = tk.Button(button_frame, text="Match Orders", command=match_orders)
-match_orders_button.pack(side=tk.LEFT, padx=5)
+    def export_to_excel(self):
+        try:
+            matched_orders = self.order_book.get_order_history()
+            if not matched_orders:
+                messagebox.showinfo("No Data", "No matched orders to export.")
+                return
+            
+            df = pd.DataFrame(matched_orders)
+            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+            df.columns = ["Buy Order ID", "Sell Order ID", "Symbol", "Quantity", "Price", "Timestamp"]
+            
+            writer = pd.ExcelWriter('matched_orders.xlsx', engine='xlsxwriter')
+            df.to_excel(writer, sheet_name='Matched Orders', index=False)
+            
+            workbook = writer.book
+            worksheet = writer.sheets['Matched Orders']
+            
+            # Add some cell formats.
+            format1 = workbook.add_format({'num_format': '0.00'}) 
+            format2 = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+            worksheet.set_column('A:F', 20)
+            worksheet.set_column('E:E', 12, format1)
+            worksheet.set_column('F:F', 20, format2)
+            
+            writer.close()
+            messagebox.showinfo("Export Successful", "Matched orders exported to matched_orders.xlsx.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to export to Excel: {e}")
 
-start_button = tk.Button(button_frame, text="Start Auto Update", command=start_updates)
-start_button.pack(side=tk.LEFT, padx=5)
+    def start_auto_update(self):
+        def auto_update():
+            while True:
+                time.sleep(5)  # Update every 5 seconds
+                self.update_gui()
+        
+        threading.Thread(target=auto_update, daemon=True).start()
 
-stop_button = tk.Button(button_frame, text="Stop Auto Update", command=stop_updates)
-stop_button.pack(side=tk.LEFT, padx=5)
-
-simulate_button = tk.Button(button_frame, text="Start Market Simulation", command=start_market_simulation)
-simulate_button.pack(side=tk.LEFT, padx=5)
-
-# Status label
-status_var = tk.StringVar()
-status_label = tk.Label(root, textvariable=status_var, bd=1, relief=tk.SUNKEN, anchor=tk.W)
-status_label.pack(fill=tk.X, side=tk.BOTTOM, ipady=2)
-
-# Open chart window
-open_chart_window()
-
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = OrderBookGUI(root)
+    root.mainloop()
