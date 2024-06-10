@@ -1,3 +1,4 @@
+xlsxwriter
 matplotlib
 numpy
 pandas
