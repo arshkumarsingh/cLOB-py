@@ -1,77 +1,89 @@
-# cLOB-py
+# cLOB-py: Centralized Limit Order Book in Python
 
-cLOB-py is a Continuous Limit Order Book simulation project designed to mimic real-world trading environments. This project allows users to simulate the matching of buy and sell orders, track order history, and visualize order book depth in real-time.
+Welcome to **cLOB-py**, a sophisticated centralized limit order book (LOB) system implemented in Python. This project simulates a real-world trading environment, allowing you to create, manage, and match buy and sell orders efficiently. 
 
 ## Features
 
-### v0.2 Updates
+### Core Functionalities
+- **Order Creation:** Supports both manual and random order creation with various parameters like price, quantity, side (buy/sell), and order type (limit/market).
+- **Order Matching:** Efficiently matches buy and sell orders based on price and timestamp, ensuring the best possible trades.
+- **Order Cancellation:** Allows users to cancel existing orders from the order book.
+- **Order Book State:** Maintains a comprehensive record of all active buy and sell orders.
+- **Order History:** Keeps a detailed history of matched orders.
 
-- **Symbol Support for Orders**: Orders now include a `symbol` attribute, supporting multiple assets like AAPL, GOOGL, MSFT, AMZN, and TSLA.
-- **Realistic Order Generation**: Enhanced order generation with realistic prices and quantities based on the symbol.
-- **Enhanced GUI Display**: The GUI displays the `symbol` along with other order details in buy and sell order trees and the order history.
-- **Order Matching and History**: Improved matching logic and detailed order history tracking.
-- **Market Simulation Mode**: A new mode to stress test the order book with a large volume of random orders.
-- **Bug Fixes and Performance Enhancements**: Various fixes and optimizations for better performance and reliability.
+### Advanced Under-the-Hood Features
+- **Efficient Data Structures:** Utilizes heaps for maintaining buy and sell orders, ensuring optimal time complexity for insertion and retrieval operations.
+- **Thread-Safe Operations:** Implements mutex locks to ensure thread-safe updates to the order book state and GUI.
+- **Logging:** Comprehensive logging of all major events like order additions, cancellations, and matches for audit and debugging purposes.
+- **Realistic Order Generation:** Generates realistic random orders based on current market prices and other parameters.
 
-## Installation
+### Graphical User Interface
+- **Real-time Updates:** GUI updates every 5 seconds to reflect the current state of the order book.
+- **Order Book Display:** Separate tree views for buy and sell orders, showing price, order count, and quantity.
+- **Order Form:** Easy-to-use form for adding manual orders with input fields for order ID, price, quantity, side, and type.
+- **Statistics:** Displays statistics like total buy/sell orders and average buy/sell prices.
+- **Charts:** Visual representation of order distributions using bar charts.
 
-1. **Clone the repository**:
+## Getting Started
+![pyqt](https://github.com/arshkumarsingh/cLOB-py/assets/66940182/9da778af-759e-4d77-a421-36b127acde72)
+
+### Prerequisites
+- Python 3.x
+- PyQt5
+- Pandas
+- Matplotlib
+
+### Installation
+1. Clone the repository:
     ```bash
-    git clone https://github.com/arshkumarsingh/cLOB-py.git
+    git clone https://github.com/arshkumarsingh/cLOB-py
     cd cLOB-py
     ```
-
-2. **Install dependencies**:
+2. Install the required packages:
     ```bash
     pip install -r requirements.txt
     ```
 
-## Usage
-
-1. **Run the GUI application**:
+### Running the Application
+1. Navigate to the project directory:
+    ```bash
+    cd /path/to/cLOB-py
+    ```
+2. Execute the main GUI script:
     ```bash
     python gui.py
     ```
 
-2. **Use the buttons**:
-    - **Add Random Order**: Generates and adds a random order to the order book.
-    - **Match Orders**: Matches buy and sell orders in the order book.
-    - **Start Auto Update**: Begins automatic generation and addition of random orders.
-    - **Stop Auto Update**: Stops the automatic generation of orders.
-    - **Start Market Simulation**: Initiates a stress test by generating a large number of random orders and updating the order book live.
+## Project Structure
 
-## Screenshots
+```plaintext
+cLOB-py/
+├── gui.py                 # Main GUI application
+├── order.py               # Order class definition
+├── order_book.py          # Order book implementation
+├── requirements.txt       # Required packages
+└── README.md              # Project documentation
+```
 
-![O![ss](https://github.com/arshkumarsingh/cLOB-py/assets/66940182/d08fbc86-951a-4b5d-bb2c-e0e01aa1bf0c)
+### `order.py`
+Defines the `Order` class with attributes like timestamp, order ID, symbol, price, quantity, side, and order type. Includes methods for initialization and representation.
 
+### `order_book.py`
+Implements the `OrderBook` class, managing buy and sell orders using heaps, matching orders, maintaining order history, and providing utility functions for order validation and realistic order generation.
+
+### `gui.py`
+Contains the `OrderBookGUI` class which provides a comprehensive graphical interface for interacting with the order book. Features include real-time updates, order form, order book display, filtering options, statistics display, and order distribution charts.
 
 ## Contributing
-
-We welcome contributions to the cLOB-py project. To contribute:
-
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Commit your changes and push the branch to your fork.
-4. Create a pull request with a detailed description of your changes.
+Contributions are welcome! Please fork the repository and create a pull request with your improvements.
 
 ## License
-
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-For any questions or feedback, please open an issue on the [GitHub repository](https://github.com/arshkumarsingh/cLOB-py).
-
----
-
-### v0.1
-
-For the initial version (v0.1), refer to the [v0.1 release notes](https://github.com/arshkumarsingh/cLOB-py/releases/tag/v0.1).
-
-### v0.2
-
-For the latest version (v0.2), refer to the [v0.2 release notes](https://github.com/arshkumarsingh/cLOB-py/releases/tag/v0.2).
+## Acknowledgements
+Special thanks to all contributors and the open-source community for their valuable support.
 
 ---
 
-We hope you find cLOB-py useful for your order book simulation needs. Happy trading!
+Feel free to explore and enhance the functionalities of **cLOB-py**. Happy trading!
+
