@@ -7,7 +7,8 @@ class Order:
         self.quantity = quantity
         self.side = side
         self.order_type = order_type
+        self.execution_time = None  # Add execution time attribute
 
     def __repr__(self):
         return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, symbol={self.symbol}, price={self.price}, "
-                f"quantity={self.quantity}, side={self.side}, order_type={self.order_type})")
+                f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, execution_time={self.execution_time})")

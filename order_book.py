@@ -37,8 +37,10 @@ class OrderBook:
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
             _, _, buy_order = heapq.heappop(self.buy_orders)
             _, _, sell_order = heapq.heappop(self.sell_orders)
-            matched_quantity = min(buy_order.quantity, sell_order.quantity)
+            
+            start_time = time.time()  # Start tracking execution time
 
+            matched_quantity = min(buy_order.quantity, sell_order.quantity)
             buy_order.quantity -= matched_quantity
             sell_order.quantity -= matched_quantity
 
@@ -59,7 +61,12 @@ class OrderBook:
             if sell_order.quantity > 0:
                 heapq.heappush(self.sell_orders, (sell_order.price, sell_order.timestamp, sell_order))
 
-            logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id}")
+            end_time = time.time()  # End tracking execution time
+            execution_time = end_time - start_time
+            buy_order.execution_time = execution_time
+            sell_order.execution_time = execution_time
+
+            logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id} in {execution_time:.4f} seconds")
             matched.append((buy_order, sell_order, matched_quantity))
 
         return matched

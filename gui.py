@@ -68,8 +68,8 @@ class OrderBookGUI(QMainWindow):
 
     def create_treeview(self, label):
         tree = QTreeWidget()
-        tree.setColumnCount(3)
-        tree.setHeaderLabels([label, "Orders", "Qty"])
+        tree.setColumnCount(4)  # Add an extra column for execution time
+        tree.setHeaderLabels([label, "Orders", "Qty", "Exec Time"])
         return tree
 
     def create_button_layout(self, layout):
@@ -278,7 +278,7 @@ class OrderBookGUI(QMainWindow):
     def update_tree(self, tree, orders):
         tree.clear()
         for order in orders:
-            item = QTreeWidgetItem([str(order.price), str(len(orders)), str(order.quantity)])
+            item = QTreeWidgetItem([str(order.price), str(len(orders)), str(order.quantity), f"{order.execution_time:.4f} s" if order.execution_time else "N/A"])
             tree.addTopLevelItem(item)
 
     def update_stock_info(self):
