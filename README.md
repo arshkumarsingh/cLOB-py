@@ -4,6 +4,7 @@
     <a href="[https://github.com/arshkumarsingh/cLOB-py/blob/LICENSE]">
     <img src="https://img.shields.io/github/license/arshkumarsingh/cLOB-py"/>
 </a>
+
 Welcome to **cLOB-py**, a sophisticated centralized limit order book (LOB) system implemented in Python. This project simulates a real-world trading environment, allowing you to create, manage, and match buy and sell orders efficiently. 
 
 ## Features
