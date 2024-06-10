@@ -42,8 +42,8 @@ cLOB-py is a Continuous Limit Order Book simulation project designed to mimic re
 
 ## Screenshots
 
-![Order Book](screenshots/order_book.png)
-![Market Simulation](screenshots/market_simulation.png)
+![O![ss](https://github.com/arshkumarsingh/cLOB-py/assets/66940182/d08fbc86-951a-4b5d-bb2c-e0e01aa1bf0c)
+
 
 ## Contributing
 
