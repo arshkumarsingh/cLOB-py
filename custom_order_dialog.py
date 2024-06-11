@@ -1,4 +1,5 @@
 import time
+import logging
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QComboBox, QSpinBox, QPushButton, QMessageBox
 from order import Order
 
@@ -8,6 +9,7 @@ class CustomOrderDialog(QDialog):
         self.order_book = order_book
         self.symbol_list = symbol_list
         self.init_ui()
+        logging.basicConfig(filename='custom_order_dialog.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
     def init_ui(self):
         self.setWindowTitle("Add Custom Order")
@@ -18,6 +20,7 @@ class CustomOrderDialog(QDialog):
         self.order_id_input = QLineEdit()
         self.price_input = QLineEdit()
         self.quantity_input = QSpinBox()
+        self.quantity_input.setRange(1, 10000)
         self.symbol_input = QComboBox()
         self.symbol_input.addItems(self.symbol_list)
         self.side_input = QComboBox()
@@ -58,6 +61,11 @@ class CustomOrderDialog(QDialog):
                 order_type=self.type_input.currentText()
             )
             self.order_book.add_order(order)
+            logging.info(f"Order added: {order}")
             self.accept()
+        except ValueError as e:
+            logging.error(f"Invalid input for order: {e}")
+            QMessageBox.critical(self, "Error", f"Invalid input: {e}")
         except Exception as e:
+            logging.error(f"Failed to add custom order: {e}")
             QMessageBox.critical(self, "Error", f"Failed to add custom order: {e}")

@@ -12,6 +12,7 @@ from PyQt5.QtCore import Qt, QTimer, QMutex, QMutexLocker
 from order import Order
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 from custom_order_dialog import CustomOrderDialog
+import logging
 
 class OrderBookGUI(QMainWindow):
     def __init__(self):
@@ -24,6 +25,7 @@ class OrderBookGUI(QMainWindow):
         self.mutex = QMutex()
         self.init_ui()
         self.start_auto_update()
+        logging.basicConfig(filename='order_book_gui.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
     def init_ui(self):
         central_widget = QWidget()
@@ -142,30 +144,35 @@ class OrderBookGUI(QMainWindow):
             order = self.generate_random_order()
             self.order_book.add_order(order)
             self.order_id_counter += 1
+            logging.info(f"Random order added: {order}")
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to add random order", str(e))
+            logging.error(f"Failed to add random order: {e}")
 
     def cancel_order(self):
         try:
             order_id = self.order_id_input.text()
             result = self.order_book.cancel_order(order_id)
             QMessageBox.information(self, "Cancel Order", result)
+            logging.info(result)
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to cancel order", str(e))
+            logging.error(f"Failed to cancel order: {e}")
 
     def match_orders(self):
         try:
             matched = self.order_book.match_orders()
             if not matched:
-                print("No orders matched.")
+                logging.info("No orders matched.")
             else:
                 for buy, sell, qty in matched:
-                    print(f"Matched {qty} units between buy order {buy.order_id} and sell order {sell.order_id}")
+                    logging.info(f"Matched {qty} units between buy order {buy.order_id} and sell order {sell.order_id}")
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to match orders", str(e))
+            logging.error(f"Failed to match orders: {e}")
 
     def apply_filter(self):
         try:
@@ -181,12 +188,14 @@ class OrderBookGUI(QMainWindow):
             self.update_tree(self.sell_tree, filtered_sell_orders)
         except Exception as e:
             self.show_error("Failed to apply filter", str(e))
+            logging.error(f"Failed to apply filter: {e}")
 
     def export_to_excel(self):
         try:
             matched_orders = self.order_book.get_order_history()
             if not matched_orders:
                 QMessageBox.information(self, "No Data", "No matched orders to export.")
+                logging.info("No matched orders to export.")
                 return
             
             df = pd.DataFrame(matched_orders)
@@ -207,8 +216,10 @@ class OrderBookGUI(QMainWindow):
             
             writer.close()
             QMessageBox.information(self, "Export Successful", "Matched orders exported to matched_orders.xlsx.")
+            logging.info("Matched orders exported to matched_orders.xlsx.")
         except Exception as e:
             self.show_error("Failed to export to Excel", str(e))
+            logging.error(f"Failed to export to Excel: {e}")
 
     def generate_random_order(self):
         symbol = self.symbol_input.currentText()  # Get the selected symbol
@@ -228,8 +239,10 @@ class OrderBookGUI(QMainWindow):
                 self.update_chart()
 
                 self.status_label.setText("Order Book Updated")
+                logging.info("GUI updated successfully")
         except Exception as e:
             self.show_error("Failed to update GUI", str(e))
+            logging.error(f"Failed to update GUI: {e}")
 
     def update_tree(self, tree, orders):
         tree.clear()
@@ -274,6 +287,7 @@ class OrderBookGUI(QMainWindow):
             self.plot_orders(buy_prices, buy_quantities, sell_prices, sell_quantities)
         except Exception as e:
             self.show_error("Failed to update chart", str(e))
+            logging.error(f"Failed to update chart: {e}")
 
     def plot_orders(self, buy_prices, buy_quantities, sell_prices, sell_quantities):
         self.ax.clear()

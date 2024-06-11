@@ -12,3 +12,24 @@ class Order:
     def __repr__(self):
         return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, symbol={self.symbol}, price={self.price}, "
                 f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, execution_time={self.execution_time})")
+
+    def is_valid(self):
+        """Validate the order details."""
+        if self.price <= 0 or self.quantity <= 0:
+            return False
+        if self.side not in ["buy", "sell"]:
+            return False
+        if self.order_type not in ["limit", "market"]:
+            return False
+        return True
+
+    def update_quantity(self, quantity):
+        """Update the order quantity."""
+        if quantity > 0:
+            self.quantity = quantity
+        else:
+            raise ValueError("Quantity must be greater than zero")
+
+    def execute(self, execution_time):
+        """Set the execution time for the order."""
+        self.execution_time = execution_time

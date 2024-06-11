@@ -1,8 +1,7 @@
-# order_book.py
-import random
 import heapq
 import time
 import logging
+import random
 from collections import deque
 from order import Order
 from user import User
@@ -15,15 +14,19 @@ class OrderBook:
         self.last_matched_price = None
         self.users = []
         self.current_user = None
-        logging.basicConfig(filename='order_book.log', level=logging.INFO)
+        logging.basicConfig(filename='order_book.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
     def add_order(self, order):
-        self.validate_order(order)
-        if order.side == "buy":
-            heapq.heappush(self.buy_orders, (-order.price, order.timestamp, order))
-        else:
-            heapq.heappush(self.sell_orders, (order.price, order.timestamp, order))
-        logging.info(f"Added order: {order}")
+        try:
+            self.validate_order(order)
+            if order.side == "buy":
+                heapq.heappush(self.buy_orders, (-order.price, order.timestamp, order))
+            else:
+                heapq.heappush(self.sell_orders, (order.price, order.timestamp, order))
+            logging.info(f"Added order: {order}")
+        except Exception as e:
+            logging.error(f"Error adding order: {order}. Error: {str(e)}")
+            raise
 
     def cancel_order(self, order_id):
         for order_list in [self.buy_orders, self.sell_orders]:
@@ -42,7 +45,7 @@ class OrderBook:
             _, _, buy_order = heapq.heappop(self.buy_orders)
             _, _, sell_order = heapq.heappop(self.sell_orders)
             
-            start_time = time.time()  # Start tracking execution time
+            start_time = time.time()
 
             matched_quantity = min(buy_order.quantity, sell_order.quantity)
             buy_order.quantity -= matched_quantity
@@ -65,7 +68,7 @@ class OrderBook:
             if sell_order.quantity > 0:
                 heapq.heappush(self.sell_orders, (sell_order.price, sell_order.timestamp, sell_order))
 
-            end_time = time.time()  # End tracking execution time
+            end_time = time.time()
             execution_time = end_time - start_time
             buy_order.execution_time = execution_time
             sell_order.execution_time = execution_time
