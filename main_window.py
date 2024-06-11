@@ -145,10 +145,29 @@ class OrderBookGUI(QMainWindow):
 
     def add_random_order(self):
         try:
-            order = self.generate_random_order()
-            self.order_book.add_order(order)
-            self.order_id_counter += 1
-            logging.info(f"Random order added: {order}")
+            if random.random() <= 0.9:
+                # Generate one buy and one sell order
+                symbol = self.symbol_input.currentText()  # Get the selected symbol
+                current_price = self.current_prices[symbol]
+
+                buy_order = generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
+                buy_order.side = "buy"
+                self.order_book.add_order(buy_order)
+                self.order_id_counter += 1
+
+                sell_order = generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
+                sell_order.side = "sell"
+                self.order_book.add_order(sell_order)
+                self.order_id_counter += 1
+
+                logging.info(f"Buy and sell orders added: {buy_order}, {sell_order}")
+            else:
+                # Generate a random order
+                order = self.generate_random_order()
+                self.order_book.add_order(order)
+                self.order_id_counter += 1
+                logging.info(f"Random order added: {order}")
+
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to add random order", str(e))
