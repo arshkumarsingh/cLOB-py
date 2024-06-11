@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, 
-                             QComboBox, QSpinBox, QMessageBox, QSplitter, QDialog)
+                             QComboBox, QSpinBox, QMessageBox, QSplitter, QDialog, QToolBar, QAction)
 from PyQt5.QtCore import Qt, QTimer, QMutex, QMutexLocker
 from order import Order
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
@@ -32,6 +32,8 @@ class OrderBookGUI(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
         
+        self.create_toolbar()
+
         header_layout = QHBoxLayout()
         self.symbol_input = QComboBox()
         self.symbol_input.addItems(self.symbols)
@@ -59,7 +61,6 @@ class OrderBookGUI(QMainWindow):
             bottom_layout.addWidget(label)
         main_layout.addLayout(bottom_layout)
 
-        self.create_button_layout(main_layout)
         self.create_filter_layout(main_layout)
         self.create_statistics_layout(main_layout)
         self.create_chart_layout(main_layout)
@@ -68,31 +69,35 @@ class OrderBookGUI(QMainWindow):
         self.status_label.setStyleSheet("color: white;")
         main_layout.addWidget(self.status_label)
 
+    def create_toolbar(self):
+        toolbar = QToolBar("Main Toolbar")
+        self.addToolBar(toolbar)
+
+        add_random_order_action = QAction("Add Random Order", self)
+        add_random_order_action.triggered.connect(self.add_random_order)
+        toolbar.addAction(add_random_order_action)
+
+        match_orders_action = QAction("Match Orders", self)
+        match_orders_action.triggered.connect(self.match_orders)
+        toolbar.addAction(match_orders_action)
+
+        cancel_order_action = QAction("Cancel Order", self)
+        cancel_order_action.triggered.connect(self.cancel_order)
+        toolbar.addAction(cancel_order_action)
+
+        export_to_excel_action = QAction("Export to Excel", self)
+        export_to_excel_action.triggered.connect(self.export_to_excel)
+        toolbar.addAction(export_to_excel_action)
+
+        add_custom_order_action = QAction("Add Custom Order", self)
+        add_custom_order_action.triggered.connect(self.open_custom_order_dialog)
+        toolbar.addAction(add_custom_order_action)
+
     def create_treeview(self, label):
         tree = QTreeWidget()
         tree.setColumnCount(4)  # Add an extra column for execution time
         tree.setHeaderLabels([label, "Orders", "Qty", "Exec Time"])
         return tree
-
-    def create_button_layout(self, layout):
-        button_layout = QHBoxLayout()
-        buttons = [
-            ("Add Random Order", self.add_random_order),
-            ("Match Orders", self.match_orders),
-            ("Cancel Order", self.cancel_order),
-            ("Export to Excel", self.export_to_excel),
-            ("Add Custom Order", self.open_custom_order_dialog)
-        ]
-        for text, slot in buttons:
-            button = QPushButton(text)
-            button.clicked.connect(slot)
-            button_layout.addWidget(button)
-        layout.addLayout(button_layout)
-
-    def open_custom_order_dialog(self):
-        dialog = CustomOrderDialog(self.order_book, self.symbols)
-        dialog.exec_()
-        self.update_gui()
 
     def create_filter_layout(self, layout):
         filter_layout = QHBoxLayout()
@@ -113,7 +118,6 @@ class OrderBookGUI(QMainWindow):
         apply_filter_button = QPushButton("Apply Filter")
         apply_filter_button.clicked.connect(self.apply_filter)
         filter_layout.addWidget(apply_filter_button)
-        
         layout.addLayout(filter_layout)
 
     def create_statistics_layout(self, layout):
@@ -173,6 +177,11 @@ class OrderBookGUI(QMainWindow):
         except Exception as e:
             self.show_error("Failed to match orders", str(e))
             logging.error(f"Failed to match orders: {e}")
+
+    def open_custom_order_dialog(self):
+        dialog = CustomOrderDialog(self.order_book, self.symbols)
+        dialog.exec_()
+        self.update_gui()
 
     def apply_filter(self):
         try:

@@ -367,3 +367,39 @@ INFO:root:Matched 5 units between buy order 1 and sell order 20 in 0.0000 second
 2024-06-11 23:45:05,988 GUI updated successfully
 2024-06-11 23:45:10,988 GUI updated successfully
 2024-06-11 23:45:15,991 GUI updated successfully
+2024-06-11 23:54:57,726 Added order: Order(timestamp=1718130297726, order_id=1, symbol=AAPL, price=347.68582456157696, quantity=69, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:54:57,727 Random order added: Order(timestamp=1718130297726, order_id=1, symbol=AAPL, price=347.68582456157696, quantity=69, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:54:57,804 GUI updated successfully
+2024-06-11 23:54:58,560 Added order: Order(timestamp=1718130298560, order_id=2, symbol=AAPL, price=326.34079735828027, quantity=77, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:54:58,560 Random order added: Order(timestamp=1718130298560, order_id=2, symbol=AAPL, price=326.34079735828027, quantity=77, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:54:58,622 GUI updated successfully
+2024-06-11 23:54:59,151 Added order: Order(timestamp=1718130299151, order_id=3, symbol=AAPL, price=320.69967217704544, quantity=65, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:54:59,151 Random order added: Order(timestamp=1718130299151, order_id=3, symbol=AAPL, price=320.69967217704544, quantity=65, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:54:59,215 GUI updated successfully
+2024-06-11 23:54:59,494 GUI updated successfully
+2024-06-11 23:54:59,659 Added order: Order(timestamp=1718130299658, order_id=4, symbol=AAPL, price=324.31181715700626, quantity=19, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:54:59,659 Random order added: Order(timestamp=1718130299658, order_id=4, symbol=AAPL, price=324.31181715700626, quantity=19, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:54:59,722 GUI updated successfully
+2024-06-11 23:55:00,194 Added order: Order(timestamp=1718130300194, order_id=5, symbol=AAPL, price=339.16235516960535, quantity=93, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:55:00,194 Random order added: Order(timestamp=1718130300194, order_id=5, symbol=AAPL, price=339.16235516960535, quantity=93, side=buy, order_type=limit, execution_time=None)
+2024-06-11 23:55:00,251 GUI updated successfully
+2024-06-11 23:55:00,683 Added order: Order(timestamp=1718130300683, order_id=6, symbol=AAPL, price=330.07748163681157, quantity=39, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:55:00,683 Random order added: Order(timestamp=1718130300683, order_id=6, symbol=AAPL, price=330.07748163681157, quantity=39, side=buy, order_type=market, execution_time=None)
+2024-06-11 23:55:00,740 GUI updated successfully
+2024-06-11 23:55:01,281 Added order: Order(timestamp=1718130301281, order_id=7, symbol=AAPL, price=326.8509096706541, quantity=82, side=sell, order_type=limit, execution_time=None)
+2024-06-11 23:55:01,281 Random order added: Order(timestamp=1718130301281, order_id=7, symbol=AAPL, price=326.8509096706541, quantity=82, side=sell, order_type=limit, execution_time=None)
+2024-06-11 23:55:01,339 GUI updated successfully
+2024-06-11 23:55:02,619 Matched 69 units between buy order 1 and sell order 7 in 0.0000 seconds
+2024-06-11 23:55:02,619 Matched 13 units between buy order 5 and sell order 7 in 0.0000 seconds
+2024-06-11 23:55:02,619 Matched 69 units between buy order 1 and sell order 7
+2024-06-11 23:55:02,619 Matched 13 units between buy order 5 and sell order 7
+2024-06-11 23:55:02,716 GUI updated successfully
+2024-06-11 23:55:03,961 No orders matched.
+2024-06-11 23:55:04,034 GUI updated successfully
+2024-06-11 23:55:04,500 GUI updated successfully
+2024-06-11 23:55:09,526 GUI updated successfully
+2024-06-11 23:55:14,501 GUI updated successfully
+2024-06-11 23:55:19,498 GUI updated successfully
+2024-06-11 23:55:24,506 GUI updated successfully
+2024-06-11 23:55:25,069 Failed to cancel order: 'OrderBookGUI' object has no attribute 'order_id_input'
+2024-06-11 23:55:29,501 GUI updated successfully
