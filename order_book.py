@@ -1,9 +1,11 @@
+# order_book.py
 import random
 import heapq
 import time
 import logging
 from collections import deque
 from order import Order
+from user import User
 
 class OrderBook:
     def __init__(self):
@@ -11,6 +13,8 @@ class OrderBook:
         self.sell_orders = []
         self.order_history = deque()
         self.last_matched_price = None
+        self.users = []
+        self.current_user = None
         logging.basicConfig(filename='order_book.log', level=logging.INFO)
 
     def add_order(self, order):
@@ -85,6 +89,25 @@ class OrderBook:
             raise ValueError("Price and quantity must be greater than zero")
         if order.side not in ["buy", "sell"]:
             raise ValueError("Side must be either 'buy' or 'sell'")
+
+    def add_user(self, username, password, role):
+        if role not in ["admin", "trader", "viewer"]:
+            raise ValueError("Role must be either 'admin', 'trader', or 'viewer'")
+        user = User(username, password, role)
+        self.users.append(user)
+        logging.info(f"User added: {user}")
+
+    def authenticate_user(self, username, password):
+        for user in self.users:
+            if user.username == username and user.check_password(password):
+                self.current_user = user
+                logging.info(f"User authenticated: {user}")
+                return True
+        logging.warning(f"Authentication failed for user: {username}")
+        return False
+
+    def get_current_user_role(self):
+        return self.current_user.role if self.current_user else None
 
 def fetch_current_prices(symbols):
     prices = {}

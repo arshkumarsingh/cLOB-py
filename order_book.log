@@ -83,3 +83,51 @@ INFO:root:Matched 13 units between buy order 26 and sell order 3 in 0.0000 secon
 INFO:root:Matched 49 units between buy order 26 and sell order 22 in 0.0000 seconds
 INFO:root:Matched 13 units between buy order 26 and sell order 28 in 0.0000 seconds
 INFO:root:Matched 6 units between buy order 26 and sell order 25 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127313494, order_id=1, symbol=AAPL, price=497.153931715423, quantity=97, side=buy, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127313821, order_id=2, symbol=AAPL, price=513.3409497505525, quantity=21, side=sell, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127314120, order_id=3, symbol=AAPL, price=490.6466565611573, quantity=26, side=buy, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127314402, order_id=4, symbol=AAPL, price=474.13615034078174, quantity=55, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127314685, order_id=5, symbol=AAPL, price=496.5501696869581, quantity=24, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127315102, order_id=6, symbol=AAPL, price=513.8023506763404, quantity=71, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127315612, order_id=7, symbol=AAPL, price=515.091482300157, quantity=54, side=sell, order_type=market, execution_time=None)
+INFO:root:Matched 55 units between buy order 1 and sell order 4 in 0.0020 seconds
+INFO:root:Added order: Order(timestamp=1718127319155, order_id=8, symbol=AAPL, price=477.0483656894042, quantity=45, side=buy, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127319326, order_id=9, symbol=AAPL, price=469.51112483749336, quantity=35, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127319537, order_id=10, symbol=AAPL, price=485.72411101041473, quantity=5, side=sell, order_type=limit, execution_time=None)
+INFO:root:Matched 35 units between buy order 1 and sell order 9 in 0.0000 seconds
+INFO:root:Matched 5 units between buy order 1 and sell order 10 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127322197, order_id=11, symbol=AAPL, price=478.6416404625084, quantity=3, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127322623, order_id=12, symbol=AAPL, price=471.44242543775607, quantity=3, side=sell, order_type=market, execution_time=None)
+INFO:root:Matched 2 units between buy order 1 and sell order 12 in 0.0000 seconds
+INFO:root:Matched 1 units between buy order 5 and sell order 12 in 0.0000 seconds
+INFO:root:Matched 3 units between buy order 5 and sell order 11 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127325279, order_id=13, symbol=AAPL, price=468.2782475254886, quantity=98, side=sell, order_type=limit, execution_time=None)
+INFO:root:Matched 20 units between buy order 5 and sell order 13 in 0.0000 seconds
+INFO:root:Matched 26 units between buy order 3 and sell order 13 in 0.0000 seconds
+INFO:root:Matched 45 units between buy order 8 and sell order 13 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127623962, order_id=10, symbol=AAPL, price=34.0, quantity=6, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127628976, order_id=1, symbol=AAPL, price=294.33591897763756, quantity=68, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127629548, order_id=2, symbol=AAPL, price=277.5393140093002, quantity=90, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127630047, order_id=3, symbol=AAPL, price=294.0684173670749, quantity=90, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127630315, order_id=4, symbol=AAPL, price=290.56274122448224, quantity=4, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127630538, order_id=5, symbol=AAPL, price=292.5569702107913, quantity=5, side=sell, order_type=limit, execution_time=None)
+INFO:root:Matched 4 units between buy order 1 and sell order 4 in 0.0000 seconds
+INFO:root:Matched 5 units between buy order 1 and sell order 5 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127632877, order_id=6, symbol=AAPL, price=289.01837592412426, quantity=6, side=sell, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127633077, order_id=7, symbol=AAPL, price=296.70775962121445, quantity=46, side=sell, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127633276, order_id=8, symbol=AAPL, price=292.9541899017566, quantity=72, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127633449, order_id=9, symbol=AAPL, price=300.90155600064185, quantity=74, side=buy, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127633640, order_id=10, symbol=AAPL, price=299.35041451430936, quantity=52, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127633829, order_id=11, symbol=AAPL, price=299.5338866669354, quantity=58, side=buy, order_type=limit, execution_time=None)
+INFO:root:Matched 6 units between buy order 9 and sell order 6 in 0.0000 seconds
+INFO:root:Matched 68 units between buy order 9 and sell order 8 in 0.0000 seconds
+INFO:root:Matched 4 units between buy order 11 and sell order 8 in 0.0000 seconds
+INFO:root:Matched 46 units between buy order 11 and sell order 7 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127636239, order_id=12, symbol=AAPL, price=283.94232266659554, quantity=94, side=sell, order_type=market, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127636457, order_id=13, symbol=AAPL, price=287.8227006986704, quantity=84, side=buy, order_type=limit, execution_time=None)
+INFO:root:Matched 8 units between buy order 11 and sell order 12 in 0.0000 seconds
+INFO:root:Matched 52 units between buy order 10 and sell order 12 in 0.0000 seconds
+INFO:root:Matched 34 units between buy order 1 and sell order 12 in 0.0000 seconds
+INFO:root:Added order: Order(timestamp=1718127659810, order_id=10, symbol=AAPL, price=34.0, quantity=8, side=buy, order_type=limit, execution_time=None)
+INFO:root:Added order: Order(timestamp=1718127681034, order_id=20, symbol=AAPL, price=34.0, quantity=5, side=sell, order_type=limit, execution_time=None)
+INFO:root:Matched 5 units between buy order 1 and sell order 20 in 0.0000 seconds

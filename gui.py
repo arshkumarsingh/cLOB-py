@@ -1,3 +1,4 @@
+# gui.py
 import sys
 import random
 import time
@@ -7,10 +8,70 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, 
-                             QComboBox, QSpinBox, QMessageBox, QSplitter)
+                             QComboBox, QSpinBox, QMessageBox, QSplitter, QDialog)
 from PyQt5.QtCore import Qt, QTimer, QMutex, QMutexLocker
 from order import Order
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
+
+class CustomOrderDialog(QDialog):
+    def __init__(self, order_book, symbol_list):
+        super().__init__()
+        self.order_book = order_book
+        self.symbol_list = symbol_list
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Add Custom Order")
+        layout = QVBoxLayout()
+
+        form_layout = QHBoxLayout()
+        
+        self.order_id_input = QLineEdit()
+        self.price_input = QLineEdit()
+        self.quantity_input = QSpinBox()
+        self.symbol_input = QComboBox()
+        self.symbol_input.addItems(self.symbol_list)
+        self.side_input = QComboBox()
+        self.side_input.addItems(["buy", "sell"])
+        self.type_input = QComboBox()
+        self.type_input.addItems(["limit", "market"])
+
+        form_layout.addWidget(QLabel("Order ID"))
+        form_layout.addWidget(self.order_id_input)
+        form_layout.addWidget(QLabel("Price"))
+        form_layout.addWidget(self.price_input)
+        form_layout.addWidget(QLabel("Quantity"))
+        form_layout.addWidget(self.quantity_input)
+        form_layout.addWidget(QLabel("Symbol"))
+        form_layout.addWidget(self.symbol_input)
+        form_layout.addWidget(QLabel("Side"))
+        form_layout.addWidget(self.side_input)
+        form_layout.addWidget(QLabel("Type"))
+        form_layout.addWidget(self.type_input)
+
+        add_order_button = QPushButton("Add Order")
+        add_order_button.clicked.connect(self.add_order)
+        form_layout.addWidget(add_order_button)
+
+        layout.addLayout(form_layout)
+        self.setLayout(layout)
+
+    def add_order(self):
+        try:
+            timestamp = int(time.time() * 1000)
+            order = Order(
+                timestamp=timestamp,
+                order_id=self.order_id_input.text(),
+                symbol=self.symbol_input.currentText(),
+                price=float(self.price_input.text()),
+                quantity=self.quantity_input.value(),
+                side=self.side_input.currentText(),
+                order_type=self.type_input.currentText()
+            )
+            self.order_book.add_order(order)
+            self.accept()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to add custom order: {e}")
 
 class OrderBookGUI(QMainWindow):
     def __init__(self):
@@ -57,7 +118,6 @@ class OrderBookGUI(QMainWindow):
         main_layout.addLayout(bottom_layout)
 
         self.create_button_layout(main_layout)
-        self.create_order_form(main_layout)
         self.create_filter_layout(main_layout)
         self.create_statistics_layout(main_layout)
         self.create_chart_layout(main_layout)
@@ -78,7 +138,8 @@ class OrderBookGUI(QMainWindow):
             ("Add Random Order", self.add_random_order),
             ("Match Orders", self.match_orders),
             ("Cancel Order", self.cancel_order),
-            ("Export to Excel", self.export_to_excel)
+            ("Export to Excel", self.export_to_excel),
+            ("Add Custom Order", self.open_custom_order_dialog)
         ]
         for text, slot in buttons:
             button = QPushButton(text)
@@ -86,37 +147,10 @@ class OrderBookGUI(QMainWindow):
             button_layout.addWidget(button)
         layout.addLayout(button_layout)
 
-    def create_order_form(self, layout):
-        form_layout = QHBoxLayout()
-        
-        self.order_id_input = QLineEdit()
-        self.price_input = QLineEdit()
-        self.quantity_input = QSpinBox()
-        self.side_input = QComboBox()
-        self.side_input.addItems(["buy", "sell"])
-        self.type_input = QComboBox()
-        self.type_input.addItems(["limit", "market"])
-
-        form_layout.addWidget(QLabel("Order ID"))
-        form_layout.addWidget(self.order_id_input)
-        form_layout.addWidget(QLabel("Price"))
-        form_layout.addWidget(self.price_input)
-        form_layout.addWidget(QLabel("Quantity"))
-        form_layout.addWidget(self.quantity_input)
-        form_layout.addWidget(QLabel("Side"))
-        form_layout.addWidget(self.side_input)
-        form_layout.addWidget(QLabel("Type"))
-        form_layout.addWidget(self.type_input)
-
-        add_order_button = QPushButton("Add Order")
-        add_order_button.clicked.connect(self.add_manual_order)
-        form_layout.addWidget(add_order_button)
-
-        cancel_order_button = QPushButton("Cancel Order")
-        cancel_order_button.clicked.connect(self.cancel_order)
-        form_layout.addWidget(cancel_order_button)
-
-        layout.addLayout(form_layout)
+    def open_custom_order_dialog(self):
+        dialog = CustomOrderDialog(self.order_book, self.symbols)
+        dialog.exec_()
+        self.update_gui()
 
     def create_filter_layout(self, layout):
         filter_layout = QHBoxLayout()
@@ -171,24 +205,6 @@ class OrderBookGUI(QMainWindow):
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to add random order", str(e))
-
-    def add_manual_order(self):
-        try:
-            timestamp = int(time.time() * 1000)
-            order = Order(
-                timestamp=timestamp,
-                order_id=self.order_id_input.text(),
-                symbol=self.symbol_input.currentText(),  # Get the selected symbol
-                price=float(self.price_input.text()),
-                quantity=self.quantity_input.value(),
-                side=self.side_input.currentText(),
-                order_type=self.type_input.currentText()
-            )
-            self.order_book.add_order(order)
-            self.order_id_counter += 1
-            self.update_gui()
-        except Exception as e:
-            self.show_error("Failed to add manual order", str(e))
 
     def cancel_order(self):
         try:
