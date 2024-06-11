@@ -2,3 +2,4 @@
 order_history.csv
 matched_orders.xlsx
 order_book.log
+*.log
