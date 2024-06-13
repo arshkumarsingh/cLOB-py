@@ -5,90 +5,107 @@
     <img src="https://img.shields.io/github/license/arshkumarsingh/cLOB-py"/>
 </a>
 
-Welcome to **cLOB-py**, a sophisticated centralized limit order book (LOB) system implemented in Python. This project simulates a real-world trading environment, allowing you to create, manage, and match buy and sell orders efficiently. 
+Welcome to **cLOB-py**, a comprehensive and efficient Centralized Limit Order Book implementation in Python. This project offers a robust solution for managing and visualizing buy and sell orders across various financial symbols, providing an intuitive GUI and powerful backend functionalities.
 
 ## Features
 
-### Core Functionalities
-- **Order Creation:** Supports both manual and random order creation with various parameters like price, quantity, side (buy/sell), and order type (limit/market).
-- **Order Matching:** Efficiently matches buy and sell orders based on price and timestamp, ensuring the best possible trades.
-- **Order Cancellation:** Allows users to cancel existing orders from the order book.
-- **Order Book State:** Maintains a comprehensive record of all active buy and sell orders.
-- **Order History:** Keeps a detailed history of matched orders.
+- **Order Management**: Add, match, and cancel buy and sell orders with ease.
+- **User Authentication**: Secure user management with role-based access.
+- **Data Export**: Export matched orders to Excel for further analysis.
+- **Real-Time Filtering**: Apply price and quantity filters to view specific orders.
+- **Visual Analytics**: Generate statistics and visualize order distributions with interactive charts.
+- **Logging**: Comprehensive logging for auditing and troubleshooting.
 
-### Advanced Under-the-Hood Features
-- **Efficient Data Structures:** Utilizes heaps for maintaining buy and sell orders, ensuring optimal time complexity for insertion and retrieval operations.
-- **Thread-Safe Operations:** Implements mutex locks to ensure thread-safe updates to the order book state and GUI.
-- **Logging:** Comprehensive logging of all major events like order additions, cancellations, and matches for audit and debugging purposes.
-- **Realistic Order Generation:** Generates realistic random orders based on current market prices and other parameters.
+## Installation
 
-### Graphical User Interface
-- **Real-time Updates:** GUI updates every 5 seconds to reflect the current state of the order book.
-- **Order Book Display:** Separate tree views for buy and sell orders, showing price, order count, and quantity.
-- **Order Form:** Easy-to-use form for adding manual orders with input fields for order ID, price, quantity, side, and type.
-- **Statistics:** Displays statistics like total buy/sell orders and average buy/sell prices.
-- **Charts:** Visual representation of order distributions using bar charts.
+To set up and run cLOB-py on your local machine, follow these steps:
 
-## Getting Started
-![pyqt](https://github.com/arshkumarsingh/cLOB-py/assets/66940182/9da778af-759e-4d77-a421-36b127acde72)
+1. **Clone the Repository**:
 
-### Prerequisites
-- Python 3.x
-- PyQt5
-- Pandas
-- Matplotlib
+   ```bash
+   git clone https://github.com/arshkumarsingh/cLOB-py.git
+   ```
 
-### Installation
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/arshkumarsingh/cLOB-py
-    cd cLOB-py
-    ```
-2. Install the required packages:
-    ```bash
-    pip install -r requirements.txt
-    ```
+2. **Navigate to the Project Directory**:
 
-### Running the Application
-1. Navigate to the project directory:
-    ```bash
-    cd /path/to/cLOB-py
-    ```
-2. Execute the main GUI script:
-    ```bash
-    python gui.py
-    ```
+   ```bash
+   cd cLOB-py
+   ```
+
+3. **Install Dependencies**:
+   Make sure you have Python installed, then run:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Application**:
+
+   ```bash
+   python main_window.py
+   ```
 
 ## Project Structure
 
-```plaintext
-cLOB-py/
-├── gui.py                 # Main GUI application
-├── order.py               # Order class definition
-├── order_book.py          # Order book implementation
-├── requirements.txt       # Required packages
-└── README.md              # Project documentation
-```
+- **main_window.py**: The main graphical user interface (GUI) for managing and visualizing orders.
+- **order.py**: Defines the `Order` class, encapsulating order properties and validation logic.
+- **order_book.py**: Manages the order book operations, including adding, matching, and canceling orders, and maintains order history.
+- **custom_order_dialog.py**: Provides a dialog interface for creating custom orders.
+- **user.py**: Handles user creation, authentication, and role management.
 
-### `order.py`
-Defines the `Order` class with attributes like timestamp, order ID, symbol, price, quantity, side, and order type. Includes methods for initialization and representation.
+## Usage
 
-### `order_book.py`
-Implements the `OrderBook` class, managing buy and sell orders using heaps, matching orders, maintaining order history, and providing utility functions for order validation and realistic order generation.
+### Adding Orders
 
-### `gui.py`
-Contains the `OrderBookGUI` class which provides a comprehensive graphical interface for interacting with the order book. Features include real-time updates, order form, order book display, filtering options, statistics display, and order distribution charts.
+- **Manual Orders**: Click "Add Custom Order" in the toolbar to input order details manually.
+- **Random Orders**: Click "Add Random Order" to generate random buy and sell orders.
+
+### Matching Orders
+
+- Click the "Match Orders" button to execute order matching based on price and quantity.
+
+### Canceling Orders
+
+- Enter the order ID in the designated input field and click "Cancel Order" to remove an order.
+
+### Exporting Data
+
+- Click "Export to Excel" to save matched orders to an Excel file for analysis.
+
+### Filtering Orders
+
+- Specify the price and quantity range in the filter section and click "Apply Filter" to refine order visibility.
+
+## Logging
+
+cLOB-py maintains detailed logs for all operations, enhancing transparency and aiding in debugging:
+
+- **custom_order_dialog.log**
+- **order_book.log**
+- **order_book_gui.log**
+- **user.log**
+
+## Dependencies
+
+- Python 3.6+
+- PyQt5
+- Redis
+- bcrypt
+- pandas
+- matplotlib
 
 ## Contributing
-Contributions are welcome! Please fork the repository and create a pull request with your improvements.
+
+Contributions are welcome! Feel free to fork the repository, make improvements, and submit a pull request. Please ensure your changes adhere to the project's coding standards and include appropriate tests.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Acknowledgements
-Special thanks to all contributors and the open-source community for their valuable support.
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contact
+
+For any inquiries or support, please reach out to [your-email@example.com].
 
 ---
 
-Feel free to explore and enhance the functionalities of **cLOB-py**. Happy trading!
-
+We hope cLOB-py serves as a valuable tool for your trading and financial analysis needs. Happy trading!
