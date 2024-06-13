@@ -7,6 +7,7 @@ We welcome contributions from the community to enhance the functionality and per
 1. **Fork the Repository:**
    - Fork the repository to your GitHub account.
    - Clone your forked repository to your local machine:
+
      ```bash
      git clone https://github.com/your-username/cLOB-py.git
      cd cLOB-py
@@ -14,6 +15,7 @@ We welcome contributions from the community to enhance the functionality and per
 
 2. **Create a Branch:**
    - Create a new branch for your feature or bug fix:
+
      ```bash
      git checkout -b your-feature-branch
      ```
@@ -30,6 +32,7 @@ We welcome contributions from the community to enhance the functionality and per
 
 3. **Commit Changes:**
    - Commit your changes with clear and concise commit messages:
+
      ```bash
      git add .
      git commit -m "Add feature XYZ"
@@ -37,6 +40,7 @@ We welcome contributions from the community to enhance the functionality and per
 
 4. **Push Changes:**
    - Push your changes to your forked repository:
+
      ```bash
      git push origin your-feature-branch
      ```
