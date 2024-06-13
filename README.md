@@ -5,6 +5,11 @@
     <img src="https://img.shields.io/github/license/arshkumarsingh/cLOB-py"/>
 </a>
 
+## Repo Stats
+
+![Alt](https://repobeats.axiom.co/api/embed/109bbd3a3002d66cea2ad9243f78cbea720c219a.svg "Repobeats analytics image")
+
+
 Welcome to **cLOB-py**, a comprehensive and efficient Centralized Limit Order Book implementation in Python. This project offers a robust solution for managing and visualizing buy and sell orders across various financial symbols, providing an intuitive GUI and powerful backend functionalities.
 
 ## Features
