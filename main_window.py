@@ -13,6 +13,9 @@ from order import Order
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 from custom_order_dialog import CustomOrderDialog
 import logging
+import redis
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 class OrderBookGUI(QMainWindow):
     def __init__(self):
@@ -179,6 +182,7 @@ class OrderBookGUI(QMainWindow):
             result = self.order_book.cancel_order(order_id)
             QMessageBox.information(self, "Cancel Order", result)
             logging.info(result)
+            redis_client.delete(f"order:{order_id}")
             self.update_gui()
         except Exception as e:
             self.show_error("Failed to cancel order", str(e))

@@ -1,11 +1,15 @@
+import redis
 import bcrypt
 import logging
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 class User:
     def __init__(self, username, password, role):
         self.username = username
         self.password = self.hash_password(password)
         self.role = role
+        redis_client.set(f"user:{self.username}", self.role)
         logging.basicConfig(filename='user.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
     def hash_password(self, password):
@@ -38,4 +42,5 @@ class User:
         """Set a new role for the user."""
         self.validate_role(new_role)
         self.role = new_role
+        redis_client.set(f"user:{self.username}", self.role)
         logging.info(f"Role changed to {new_role} for user: {self.username}")

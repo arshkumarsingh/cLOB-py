@@ -5,6 +5,9 @@ import random
 from collections import deque
 from order import Order
 from user import User
+import redis
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 class OrderBook:
     def __init__(self):
@@ -24,6 +27,7 @@ class OrderBook:
             else:
                 heapq.heappush(self.sell_orders, (order.price, order.timestamp, order))
             logging.info(f"Added order: {order}")
+            redis_client.set(f"order:{order.order_id}", order.__repr__())
         except Exception as e:
             logging.error(f"Error adding order: {order}. Error: {str(e)}")
             raise
@@ -35,6 +39,7 @@ class OrderBook:
                     order_list.pop(index)
                     heapq.heapify(order_list)
                     logging.info(f"Order {order_id} cancelled.")
+                    redis_client.delete(f"order:{order_id}")
                     return f"Order {order_id} cancelled."
         logging.warning(f"Order {order_id} not found.")
         return f"Order {order_id} not found."
@@ -75,6 +80,8 @@ class OrderBook:
 
             logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id} in {execution_time:.4f} seconds")
             matched.append((buy_order, sell_order, matched_quantity))
+            redis_client.set(f"order:{buy_order.order_id}", buy_order.__repr__())
+            redis_client.set(f"order:{sell_order.order_id}", sell_order.__repr__())
 
         return matched
 
@@ -99,12 +106,14 @@ class OrderBook:
         user = User(username, password, role)
         self.users.append(user)
         logging.info(f"User added: {user}")
+        redis_client.set(f"user:{username}", user.__repr__())
 
     def authenticate_user(self, username, password):
         for user in self.users:
             if user.username == username and user.check_password(password):
                 self.current_user = user
                 logging.info(f"User authenticated: {user}")
+                redis_client.set(f"user:{username}", user.__repr__())
                 return True
         logging.warning(f"Authentication failed for user: {username}")
         return False

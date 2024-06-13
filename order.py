@@ -1,3 +1,5 @@
+import redis
+
 class Order:
     def __init__(self, timestamp, order_id, symbol, price, quantity, side, order_type='limit'):
         self.timestamp = timestamp
