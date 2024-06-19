@@ -14,6 +14,7 @@ from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 from custom_order_dialog import CustomOrderDialog
 import logging
 import redis
+import excel_exporter  # Import the new module
 
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -225,30 +226,8 @@ class OrderBookGUI(QMainWindow):
     def export_to_excel(self):
         try:
             matched_orders = self.order_book.get_order_history()
-            if not matched_orders:
-                QMessageBox.information(self, "No Data", "No matched orders to export.")
-                logging.info("No matched orders to export.")
-                return
-            
-            df = pd.DataFrame(matched_orders)
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
-            df.columns = ["Buy Order ID", "Sell Order ID", "Symbol", "Quantity", "Price", "Timestamp"]
-            
-            writer = pd.ExcelWriter('matched_orders.xlsx', engine='xlsxwriter')
-            df.to_excel(writer, sheet_name='Matched Orders', index=False)
-            
-            workbook = writer.book
-            worksheet = writer.sheets['Matched Orders']
-            
-            format1 = workbook.add_format({'num_format': '0.00'}) 
-            format2 = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
-            worksheet.set_column('A:F', 20)
-            worksheet.set_column('E:E', 12, format1)
-            worksheet.set_column('F:F', 20, format2)
-            
-            writer.close()
-            QMessageBox.information(self, "Export Successful", "Matched orders exported to matched_orders.xlsx.")
-            logging.info("Matched orders exported to matched_orders.xlsx.")
+            result = excel_exporter.export_orders_to_excel(matched_orders)
+            QMessageBox.information(self, "Export to Excel", result)
         except Exception as e:
             self.show_error("Failed to export to Excel", str(e))
             logging.error(f"Failed to export to Excel: {e}")

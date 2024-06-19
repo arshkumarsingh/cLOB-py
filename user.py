@@ -1,6 +1,7 @@
 import redis
 import bcrypt
 import logging
+from datetime import datetime
 
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -9,6 +10,7 @@ class User:
         self.username = username
         self.password = self.hash_password(password)
         self.role = role
+        self.logged_in = False
         redis_client.set(f"user:{self.username}", self.role)
         logging.basicConfig(filename='user.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -44,3 +46,17 @@ class User:
         self.role = new_role
         redis_client.set(f"user:{self.username}", self.role)
         logging.info(f"Role changed to {new_role} for user: {self.username}")
+
+    def login(self, password):
+        """User login."""
+        if self.check_password(password):
+            self.logged_in = True
+            logging.info(f"User logged in: {self.username}")
+            return True
+        logging.warning(f"Login failed for user: {self.username}")
+        return False
+
+    def logout(self):
+        """User logout."""
+        self.logged_in = False
+        logging.info(f"User logged out: {self.username}")

@@ -36,6 +36,7 @@ class OrderBook:
         for order_list in [self.buy_orders, self.sell_orders]:
             for index, (_, _, order) in enumerate(order_list):
                 if order.order_id == order_id:
+                    order.cancel()
                     order_list.pop(index)
                     heapq.heapify(order_list)
                     logging.info(f"Order {order_id} cancelled.")
@@ -75,8 +76,8 @@ class OrderBook:
 
             end_time = time.time()
             execution_time = end_time - start_time
-            buy_order.execution_time = execution_time
-            sell_order.execution_time = execution_time
+            buy_order.execute(execution_time)
+            sell_order.execute(execution_time)
 
             logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id} in {execution_time:.4f} seconds")
             matched.append((buy_order, sell_order, matched_quantity))

@@ -1,4 +1,5 @@
 import redis
+from datetime import datetime
 
 class Order:
     def __init__(self, timestamp, order_id, symbol, price, quantity, side, order_type='limit'):
@@ -10,10 +11,11 @@ class Order:
         self.side = side
         self.order_type = order_type
         self.execution_time = None  # Add execution time attribute
+        self.status = 'pending'  # Track order status
 
     def __repr__(self):
         return (f"Order(timestamp={self.timestamp}, order_id={self.order_id}, symbol={self.symbol}, price={self.price}, "
-                f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, execution_time={self.execution_time})")
+                f"quantity={self.quantity}, side={self.side}, order_type={self.order_type}, execution_time={self.execution_time}, status={self.status})")
 
     def is_valid(self):
         """Validate the order details."""
@@ -35,3 +37,15 @@ class Order:
     def execute(self, execution_time):
         """Set the execution time for the order."""
         self.execution_time = execution_time
+        self.status = 'fulfilled'
+
+    def cancel(self):
+        """Cancel the order."""
+        self.status = 'canceled'
+
+    def modify(self, price=None, quantity=None):
+        """Modify the order."""
+        if price:
+            self.price = price
+        if quantity:
+            self.update_quantity(quantity)
