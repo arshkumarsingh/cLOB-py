@@ -1,7 +1,6 @@
 streamlit==1.30.0
 pandas==1.4.0
 matplotlib==3.5.1
-redis==4.0.2
 bcrypt==3.2.0
 PyQt5==5.15.6
 xlsxwriter==3.0.2
