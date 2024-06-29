@@ -3,10 +3,27 @@ import logging
 
 class User:
     def __init__(self, username, password, role):
+        """
+        Initialize a new User object.
+
+        Args:
+            username (str): The username of the user.
+            password (str): The password of the user.
+            role (str): The role of the user.
+        """
+        # Set the username of the user
         self.username = username
+
+        # Hash the password using bcrypt and set it as the user's password
         self.password = self.hash_password(password)
+
+        # Set the role of the user
         self.role = role
+
+        # Set the logged_in flag to False, indicating that the user is not logged in
         self.logged_in = False
+
+        # Configure logging to a file named 'user.log' with the INFO log level and a specific format for log messages
         logging.basicConfig(filename='user.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
     def hash_password(self, password):
