@@ -1,3 +1,7 @@
+"""
+This module contains the main GUI class for the Order Book application.
+"""
+
 import sys
 import random
 import time
@@ -5,16 +9,34 @@ import threading
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, 
-                             QComboBox, QSpinBox, QMessageBox, QSplitter, QDialog, QToolBar, QAction)
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, 
+    QPushButton, QWidget, QTreeWidget, QTreeWidgetItem, QLineEdit, 
+    QComboBox, QSpinBox, QMessageBox, QSplitter, QDialog, QToolBar, QAction
+)
 from PyQt5.QtCore import Qt, QTimer, QMutex, QMutexLocker
+
+# Import the Order and OrderBook classes from the order module
 from order import Order
-from order_book import OrderBook, fetch_current_prices, generate_realistic_order
+from order_book import OrderBook
+
+# Import the functions for fetching current prices and generating realistic orders
+from order_book import fetch_current_prices, generate_realistic_order
+
+# Import the CustomOrderDialog class from the custom_order_dialog module
 from custom_order_dialog import CustomOrderDialog
+
+# Import the logging module for debugging and error handling
 import logging
+
+# Import the redis module for accessing the Redis database
 import redis
-import excel_exporter  # Import the new module
+
+# Import the excel_exporter module for exporting data to Excel
+import excel_exporter
+
+# Create a logger for the main_window module
+logger = logging.getLogger(__name__)
 
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -71,40 +93,19 @@ class OrderBookGUI(QMainWindow):
 
         This function sets up the main window's layout and adds various widgets to it.
         """
-        print("Initializing UI...")
         # Create the central widget and set it as the main widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        print("Central widget initialized")
 
         # Create the main vertical layout
         main_layout = QVBoxLayout(central_widget)
-        print("Main vertical layout initialized")
 
         # Create the toolbar and add it to the main layout
         self.create_toolbar()
-        print("Toolbar created")
 
         # Create the header layout
-        header_layout = QHBoxLayout()
-        print("Header layout initialized")
-
-        # Create the symbol input combo box and add it to the header layout
-        self.symbol_input = QComboBox()
-        self.symbol_input.addItems(self.symbols)
-        header_layout.addWidget(QLabel("Symbol"))
-        header_layout.addWidget(self.symbol_input)
-        print("Symbol input combo box added to header layout")
-
-        # Create the price label and add it to the header layout
-        self.price_label = QLabel("")
-        self.price_label.setStyleSheet("font-size: 16px; color: red;")
-        header_layout.addWidget(self.price_label)
-        print("Price label added to header layout")
-
-        # Add the header layout to the main layout
-        main_layout.addLayout(header_layout)
-        print("Header layout added to main layout")
+        self.header_layout = QHBoxLayout()
+        main_layout.addLayout(self.header_layout)
 
         # Create the splitter and add the buy and sell tree views to it
         splitter = QSplitter(Qt.Horizontal)
@@ -112,47 +113,36 @@ class OrderBookGUI(QMainWindow):
         self.sell_tree = self.create_treeview("Sell Orders")
         splitter.addWidget(self.buy_tree)
         splitter.addWidget(self.sell_tree)
-        print("Buy and sell tree views added to splitter")
-
-        # Add the splitter to the main layout
         main_layout.addWidget(splitter)
-        print("Splitter added to main layout")
 
         # Create the bottom layout
-        bottom_layout = QHBoxLayout()
-        print("Bottom layout initialized")
-
-        # Create the labels and add them to the bottom layout
-        self.low_label = QLabel("")
-        self.high_label = QLabel("")
-        self.open_label = QLabel("")
-        self.prev_close_label = QLabel("")
-        for label in [self.low_label, self.high_label, self.open_label, self.prev_close_label]:
-            label.setStyleSheet("font-size: 12px; color: white;")
-            bottom_layout.addWidget(label)
-            print(f"{label} added to bottom layout")
-
-        # Add the bottom layout to the main layout
-        main_layout.addLayout(bottom_layout)
-        print("Bottom layout added to main layout")
+        self.bottom_layout = QHBoxLayout()
+        main_layout.addLayout(self.bottom_layout)
 
         # Create the filter layout and add it to the main layout
-        self.create_filter_layout(main_layout)
-        print("Filter layout created and added to main layout")
+        self.create_filter_layout()
 
         # Create the statistics layout and add it to the main layout
-        self.create_statistics_layout(main_layout)
-        print("Statistics layout created and added to main layout")
+        self.create_statistics_layout()
 
         # Create the chart layout and add it to the main layout
-        self.create_chart_layout(main_layout)
-        print("Chart layout created and added to main layout")
+        self.create_chart_layout()
 
         # Create the status label and add it to the main layout
         self.status_label = QLabel("")
         self.status_label.setStyleSheet("color: white;")
         main_layout.addWidget(self.status_label)
-        print("Status label created and added to main layout")
+
+        # Add all the widgets to the main layout in one pass
+        self.header_layout.addWidget(QLabel("Symbol"))
+        self.header_layout.addWidget(self.symbol_input)
+        self.header_layout.addWidget(self.price_label)
+
+        self.bottom_layout.addWidget(self.low_label)
+        self.bottom_layout.addWidget(self.high_label)
+        self.bottom_layout.addWidget(self.open_label)
+        self.bottom_layout.addWidget(self.prev_close_label)
+
         print("UI initialization complete")
 
     def create_toolbar(self):
@@ -230,27 +220,49 @@ class OrderBookGUI(QMainWindow):
         layout.addLayout(filter_layout)
 
     def create_statistics_layout(self, layout):
+        """
+        Create a layout for displaying statistics.
+
+        Args:
+            layout (QVBoxLayout): The layout to add the statistics layout to.
+        """
+        # Create a vertical layout for the statistics
         stats_layout = QVBoxLayout()
+        
+        # Create labels for total buy and sell orders, average buy and sell prices
         self.total_buy_orders_label = QLabel("0")
         self.total_sell_orders_label = QLabel("0")
         self.avg_buy_price_label = QLabel("0.00")
         self.avg_sell_price_label = QLabel("0.00")
         
+        # Add labels and their corresponding values to the statistics layout
         for label_text, label in [("Total Buy Orders", self.total_buy_orders_label), 
                                   ("Total Sell Orders", self.total_sell_orders_label), 
                                   ("Average Buy Price", self.avg_buy_price_label), 
                                   ("Average Sell Price", self.avg_sell_price_label)]:
+            # Create a horizontal layout for each label and its corresponding value
             h_layout = QHBoxLayout()
-            h_layout.addWidget(QLabel(label_text))
-            h_layout.addWidget(label)
-            stats_layout.addLayout(h_layout)
+            h_layout.addWidget(QLabel(label_text))  # Add label text
+            h_layout.addWidget(label)  # Add label value
+            stats_layout.addLayout(h_layout)  # Add horizontal layout to the statistics layout
         
-        layout.addLayout(stats_layout)
+        layout.addLayout(stats_layout)  # Add the statistics layout to the main layout
 
     def create_chart_layout(self, layout):
-        self.fig, self.ax = plt.subplots()
-        self.chart_canvas = FigureCanvas(self.fig)
-        layout.addWidget(self.chart_canvas)
+        """
+        Create a layout for displaying a chart.
+
+        Args:
+            layout (QVBoxLayout): The layout to add the chart layout to.
+        """
+        # Create a figure and axes for the chart
+        self.fig, self.ax = plt.subplots()  # Create a figure and axes
+        
+        # Create a canvas to display the chart
+        self.chart_canvas = FigureCanvas(self.fig)  # Create a canvas to display the figure
+        
+        # Add the canvas to the layout
+        layout.addWidget(self.chart_canvas)  # Add the canvas to the layout
 
     def add_random_order(self):
         """
@@ -349,23 +361,60 @@ class OrderBookGUI(QMainWindow):
             logging.error(f"Failed to match orders: {e}")
 
     def open_custom_order_dialog(self):
+        """
+        Open the custom order dialog and update the GUI.
+
+        This function creates a new instance of the CustomOrderDialog class
+        using the current order book and symbol list. It then displays the
+        dialog and updates the GUI after the dialog is closed.
+
+        Raises:
+            Exception: If there is an error creating the dialog or updating the GUI.
+        """
+        # Create a new instance of the CustomOrderDialog class
         dialog = CustomOrderDialog(self.order_book, self.symbols)
+
+        # Display the dialog and wait for it to be closed
         dialog.exec_()
+
+        # Update the GUI after the dialog is closed
         self.update_gui()
 
     def apply_filter(self):
+        """
+        Apply the filter to the buy and sell orders in the order book and update the GUI.
+
+        This function retrieves the minimum and maximum price and quantity values from the input fields.
+        It then filters the buy and sell orders in the order book based on the price and quantity ranges.
+        The filtered orders are stored in separate lists and used to update the buy and sell trees in the GUI.
+
+        Raises:
+            Exception: If there is an error retrieving the input values or applying the filter.
+        """
         try:
+            # Retrieve the minimum and maximum price values from the input fields
             min_price = float(self.min_price_input.text())
             max_price = float(self.max_price_input.text())
+
+            # Retrieve the minimum and maximum quantity values from the input fields
             min_qty = self.min_qty_input.value()
             max_qty = self.max_qty_input.value()
-            
-            filtered_buy_orders = [order for _, _, order in self.order_book.buy_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
-            filtered_sell_orders = [order for _, _, order in self.order_book.sell_orders if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
-            
+
+            # Filter the buy orders based on the price and quantity ranges
+            filtered_buy_orders = [order for _, _, order in self.order_book.buy_orders
+                                   if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
+
+            # Filter the sell orders based on the price and quantity ranges
+            filtered_sell_orders = [order for _, _, order in self.order_book.sell_orders
+                                    if min_price <= order.price <= max_price and min_qty <= order.quantity <= max_qty]
+
+            # Update the buy tree with the filtered buy orders
             self.update_tree(self.buy_tree, filtered_buy_orders)
+
+            # Update the sell tree with the filtered sell orders
             self.update_tree(self.sell_tree, filtered_sell_orders)
         except Exception as e:
+            # Handle any exceptions that occur during the filter application process
             self.show_error("Failed to apply filter", str(e))
             logging.error(f"Failed to apply filter: {e}")
 
@@ -379,8 +428,23 @@ class OrderBookGUI(QMainWindow):
             logging.error(f"Failed to export to Excel: {e}")
 
     def generate_random_order(self):
-        symbol = self.symbol_input.currentText()  # Get the selected symbol
+        """
+        Generate a random order with current symbol and price.
+
+        This function retrieves the current symbol and price from the GUI
+        and uses them to generate a random order with a new order ID.
+
+        Returns:
+            Order: The generated random order.
+        """
+
+        # Get the selected symbol
+        symbol = self.symbol_input.currentText()
+
+        # Get the current price for the selected symbol
         current_price = self.current_prices[symbol]
+
+        # Generate a random order with a new order ID
         return generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
 
     def update_gui(self):
@@ -433,13 +497,32 @@ class OrderBookGUI(QMainWindow):
             tree.addTopLevelItem(item)
 
     def update_stock_info(self):
+        """
+        Update the stock information on the GUI.
+
+        This function retrieves the last matched price from the order book and calculates the current price,
+        price change, and percentage change compared to the current price for the selected symbol. It then
+        updates the GUI label with the current price and its change information. The label color is set
+        to green if the price change is positive and red if it is negative. Finally, it updates the current
+        price for the selected symbol in the `self.current_prices` dictionary.
+        """
+        # Check if last matched price is available
         if self.order_book.last_matched_price is not None:
+            # Retrieve the last matched price
             last_price = self.order_book.last_matched_price
+            
+            # Calculate the current price as the last matched price
             current_price = last_price
+            
+            # Calculate the price change and percentage change
             price_change = current_price - self.current_prices[self.symbol_input.currentText()]
             percent_change = (price_change / self.current_prices[self.symbol_input.currentText()]) * 100
+            
+            # Update the GUI label with the current price and its change information
             self.price_label.setText(f"{current_price:.2f}  {price_change:.2f} ({percent_change:.2f}%)")
             self.price_label.setStyleSheet("color: green;" if price_change >= 0 else "color: red;")
+            
+            # Update the current price for the selected symbol
             self.current_prices[self.symbol_input.currentText()] = current_price
 
     def update_statistics(self):
