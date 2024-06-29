@@ -20,42 +20,109 @@ redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 class OrderBookGUI(QMainWindow):
     def __init__(self):
-        super().__init__()
+        """
+        Initialize the OrderBookGUI class.
+
+        This constructor initializes the following attributes:
+        - order_book: an instance of the OrderBook class
+        - order_id_counter: a counter for generating unique order IDs
+        - symbols: a list of financial symbols
+        - current_prices: a dictionary of current prices for the symbols
+        - mutex: a QMutex object for thread synchronization
+
+        It also sets up the user interface, starts the auto-update timer, and configures logging.
+        """
+        super().__init__()  # Call the parent constructor
+
+        # Set the window title
         self.setWindowTitle("Order Book Ladder")
+
+        # Initialize the order book
         self.order_book = OrderBook()
+
+        # Initialize the order ID counter
         self.order_id_counter = 1
+
+        # Initialize the list of financial symbols
         self.symbols = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA']
+
+        # Fetch the current prices for the symbols
         self.current_prices = fetch_current_prices(self.symbols)
+
+        # Initialize the mutex for thread synchronization
         self.mutex = QMutex()
+
+        # Initialize the user interface
         self.init_ui()
+
+        # Start the auto-update timer
         self.start_auto_update()
-        logging.basicConfig(filename='order_book_gui.log', level=logging.INFO, format='%(asctime)s %(message)s')
+
+        # Configure logging
+        logging.basicConfig(
+            filename='order_book_gui.log',
+            level=logging.INFO,
+            format='%(asctime)s %(message)s'
+        )
 
     def init_ui(self):
+        """
+        Initialize the user interface.
+
+        This function sets up the main window's layout and adds various widgets to it.
+        """
+        print("Initializing UI...")
+        # Create the central widget and set it as the main widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-        
-        self.create_toolbar()
+        print("Central widget initialized")
 
+        # Create the main vertical layout
+        main_layout = QVBoxLayout(central_widget)
+        print("Main vertical layout initialized")
+
+        # Create the toolbar and add it to the main layout
+        self.create_toolbar()
+        print("Toolbar created")
+
+        # Create the header layout
         header_layout = QHBoxLayout()
+        print("Header layout initialized")
+
+        # Create the symbol input combo box and add it to the header layout
         self.symbol_input = QComboBox()
         self.symbol_input.addItems(self.symbols)
         header_layout.addWidget(QLabel("Symbol"))
         header_layout.addWidget(self.symbol_input)
+        print("Symbol input combo box added to header layout")
+
+        # Create the price label and add it to the header layout
         self.price_label = QLabel("")
         self.price_label.setStyleSheet("font-size: 16px; color: red;")
         header_layout.addWidget(self.price_label)
-        main_layout.addLayout(header_layout)
+        print("Price label added to header layout")
 
+        # Add the header layout to the main layout
+        main_layout.addLayout(header_layout)
+        print("Header layout added to main layout")
+
+        # Create the splitter and add the buy and sell tree views to it
         splitter = QSplitter(Qt.Horizontal)
         self.buy_tree = self.create_treeview("Buy Orders")
         self.sell_tree = self.create_treeview("Sell Orders")
         splitter.addWidget(self.buy_tree)
         splitter.addWidget(self.sell_tree)
-        main_layout.addWidget(splitter)
+        print("Buy and sell tree views added to splitter")
 
+        # Add the splitter to the main layout
+        main_layout.addWidget(splitter)
+        print("Splitter added to main layout")
+
+        # Create the bottom layout
         bottom_layout = QHBoxLayout()
+        print("Bottom layout initialized")
+
+        # Create the labels and add them to the bottom layout
         self.low_label = QLabel("")
         self.high_label = QLabel("")
         self.open_label = QLabel("")
@@ -63,36 +130,61 @@ class OrderBookGUI(QMainWindow):
         for label in [self.low_label, self.high_label, self.open_label, self.prev_close_label]:
             label.setStyleSheet("font-size: 12px; color: white;")
             bottom_layout.addWidget(label)
+            print(f"{label} added to bottom layout")
+
+        # Add the bottom layout to the main layout
         main_layout.addLayout(bottom_layout)
+        print("Bottom layout added to main layout")
 
+        # Create the filter layout and add it to the main layout
         self.create_filter_layout(main_layout)
-        self.create_statistics_layout(main_layout)
-        self.create_chart_layout(main_layout)
+        print("Filter layout created and added to main layout")
 
+        # Create the statistics layout and add it to the main layout
+        self.create_statistics_layout(main_layout)
+        print("Statistics layout created and added to main layout")
+
+        # Create the chart layout and add it to the main layout
+        self.create_chart_layout(main_layout)
+        print("Chart layout created and added to main layout")
+
+        # Create the status label and add it to the main layout
         self.status_label = QLabel("")
         self.status_label.setStyleSheet("color: white;")
         main_layout.addWidget(self.status_label)
+        print("Status label created and added to main layout")
+        print("UI initialization complete")
 
     def create_toolbar(self):
+        """
+        Create a toolbar with actions for adding random orders, matching orders,
+        canceling orders, exporting to Excel, and adding custom orders.
+        """
+        # Create the toolbar
         toolbar = QToolBar("Main Toolbar")
         self.addToolBar(toolbar)
 
+        # Add a random order action
         add_random_order_action = QAction("Add Random Order", self)
         add_random_order_action.triggered.connect(self.add_random_order)
         toolbar.addAction(add_random_order_action)
 
+        # Add a match orders action
         match_orders_action = QAction("Match Orders", self)
         match_orders_action.triggered.connect(self.match_orders)
         toolbar.addAction(match_orders_action)
 
+        # Add a cancel order action
         cancel_order_action = QAction("Cancel Order", self)
         cancel_order_action.triggered.connect(self.cancel_order)
         toolbar.addAction(cancel_order_action)
 
+        # Add an export to Excel action
         export_to_excel_action = QAction("Export to Excel", self)
         export_to_excel_action.triggered.connect(self.export_to_excel)
         toolbar.addAction(export_to_excel_action)
 
+        # Add an add custom order action
         add_custom_order_action = QAction("Add Custom Order", self)
         add_custom_order_action.triggered.connect(self.open_custom_order_dialog)
         toolbar.addAction(add_custom_order_action)
@@ -198,6 +290,21 @@ class OrderBookGUI(QMainWindow):
             logging.error(f"Failed to add random order: {e}")
 
     def cancel_order(self):
+        """
+        Cancels an order with the given order ID.
+
+        This method attempts to cancel an order by calling the `cancel_order` method of the `order_book` object with the provided order ID. If the cancellation is successful, a message box is displayed with the result. The result is also logged using the `logging` module.
+
+        After the order is successfully cancelled, the corresponding order entry is deleted from the Redis database using the `redis_client.delete` method. Finally, the GUI is updated by calling the `update_gui` method.
+
+        If any exception occurs during the cancellation process, an error message box is displayed with the error message. The error is also logged using the `logging` module.
+
+        Parameters:
+            self (object): The instance of the class.
+        
+        Returns:
+            None
+        """
         try:
             order_id = self.order_id_input.text()
             result = self.order_book.cancel_order(order_id)
