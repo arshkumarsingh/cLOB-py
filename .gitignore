@@ -4,3 +4,5 @@ matched_orders.xlsx
 order_book.log
 *.log
 order_book.log
+*.log
+*.pyc

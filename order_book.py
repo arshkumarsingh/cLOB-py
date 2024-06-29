@@ -86,25 +86,29 @@ class OrderBook:
         logging.warning(f"Order {order_id} not found.")
         return f"Order {order_id} not found."
 
-    def match_orders(self):
+    def match_orders(self) -> List[Tuple[Order, Order, int]]:
         """
         Matches buy and sell orders based on quantity and price, updates order quantities, 
         creates matched orders, logs the match, and returns a list of matched orders.
+
+        Returns:
+            List[Tuple[Order, Order, int]]: A list of tuples containing the matched orders, 
+                their quantities, and the timestamp of the match.
         """
-        matched = []
+        matched: List[Tuple[Order, Order, int]] = []
         print("Matching orders...")
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
             print("------------------------------------------------------")
             print("Current buy order:", self.buy_orders[0])
             print("Current sell order:", self.sell_orders[0])
-            buy_price, _, buy_order = self.buy_orders[0]
-            sell_price, _, sell_order = self.sell_orders[0]
+            buy_price, _, buy_order: Order = self.buy_orders[0]
+            sell_price, _, sell_order: Order = self.sell_orders[0]
 
-            matched_quantity = min(buy_order.quantity, sell_order.quantity)
+            matched_quantity: int = min(buy_order.quantity, sell_order.quantity)
             buy_order.quantity -= matched_quantity
             sell_order.quantity -= matched_quantity
 
-            matched_order = {
+            matched_order: Dict[str, Union[str, int]] = {
                 "buy_order_id": buy_order.order_id,
                 "sell_order_id": sell_order.order_id,
                 "symbol": buy_order.symbol,
