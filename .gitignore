@@ -6,3 +6,4 @@ order_book.log
 order_book.log
 *.log
 *.pyc
+__pycache__/order.cpython-312.pyc
