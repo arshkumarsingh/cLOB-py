@@ -98,7 +98,9 @@ class OrderBook:
         """
         matched: List[Tuple[Order, Order, int]] = []
 
+        print("Starting order matching...")
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
+            print("Matching orders...")
             buy_price, _, buy_order = self.buy_orders[0]
             sell_price, _, sell_order = self.sell_orders[0]
 
@@ -136,10 +138,19 @@ class OrderBook:
                 f" and sell order {sell_order.order_id}"
             )
             matched.append((buy_order, sell_order, matched_quantity))
+            print("Orders matched.")
 
+        print("Order matching completed.")
         return matched
 
-    def get_order_book(self):
+    def get_order_book(self) -> Dict[str, List[Order]]:
+        """
+        Returns a dictionary representation of the order book.
+
+        Returns:
+            Dict[str, List[Order]]: A dictionary with keys "buy_orders" and "sell_orders",
+            each containing a list of Order objects.
+        """
         return {
             "buy_orders": [order for _, _, order in self.buy_orders],
             "sell_orders": [order for _, _, order in self.sell_orders]
