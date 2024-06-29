@@ -93,10 +93,8 @@ class OrderBook:
         """
         matched = []
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
-            _, _, buy_order = heapq.heappop(self.buy_orders)
-            _, _, sell_order = heapq.heappop(self.sell_orders)
-
-            start_time = time.time()
+            buy_price, _, buy_order = self.buy_orders[0]
+            sell_price, _, sell_order = self.sell_orders[0]
 
             matched_quantity = min(buy_order.quantity, sell_order.quantity)
             buy_order.quantity -= matched_quantity
@@ -107,24 +105,27 @@ class OrderBook:
                 "sell_order_id": sell_order.order_id,
                 "symbol": buy_order.symbol,
                 "quantity": matched_quantity,
-                "price": sell_order.price,
+                "price": sell_price,
                 "timestamp": int(time.time())
             }
 
             self.order_history.appendleft(matched_order)
-            self.last_matched_price = sell_order.price
+            self.last_matched_price = sell_price
 
-            if buy_order.quantity > 0:
-                heapq.heappush(self.buy_orders, (-buy_order.price, buy_order.timestamp, buy_order))
-            if sell_order.quantity > 0:
-                heapq.heappush(self.sell_orders, (sell_order.price, sell_order.timestamp, sell_order))
+            if buy_order.quantity:
+                heapq.heappush(self.buy_orders, (-buy_price, buy_order.timestamp, buy_order))
+            else:
+                heapq.heappop(self.buy_orders)
 
-            end_time = time.time()
-            execution_time = end_time - start_time
-            buy_order.execute(execution_time)
-            sell_order.execute(execution_time)
+            if sell_order.quantity:
+                heapq.heappush(self.sell_orders, (sell_price, sell_order.timestamp, sell_order))
+            else:
+                heapq.heappop(self.sell_orders)
 
-            logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id} in {execution_time:.4f} seconds")
+            buy_order.execute(0)
+            sell_order.execute(0)
+
+            logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id}")
             matched.append((buy_order, sell_order, matched_quantity))
 
         return matched
