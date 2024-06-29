@@ -3,6 +3,7 @@ import pandas as pd
 from order_book import OrderBook, fetch_current_prices, generate_realistic_order
 from user import User
 import excel_exporter
+from order import Order
 
 # Initialize the order book
 order_book = OrderBook()
