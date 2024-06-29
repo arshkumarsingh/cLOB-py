@@ -311,21 +311,35 @@ class OrderBookGUI(QMainWindow):
 
         If any exception occurs during the cancellation process, an error message box is displayed with the error message. The error is also logged using the `logging` module.
 
-        Parameters:
-            self (object): The instance of the class.
-        
+        Args:
+            self (OrderBookGUI): The instance of the class.
+
         Returns:
             None
         """
         try:
+            # Get the order ID from the input field
             order_id = self.order_id_input.text()
+
+            # Call the `cancel_order` method of the `order_book` object with the order ID
             result = self.order_book.cancel_order(order_id)
+
+            # Display a message box with the result
             QMessageBox.information(self, "Cancel Order", result)
+
+            # Log the result
             logging.info(result)
+
+            # Delete the corresponding order entry from the Redis database
             redis_client.delete(f"order:{order_id}")
+
+            # Update the GUI
             self.update_gui()
         except Exception as e:
+            # Display an error message box with the error message
             self.show_error("Failed to cancel order", str(e))
+
+            # Log the error
             logging.error(f"Failed to cancel order: {e}")
 
     def match_orders(self):
@@ -419,11 +433,28 @@ class OrderBookGUI(QMainWindow):
             logging.error(f"Failed to apply filter: {e}")
 
     def export_to_excel(self):
+        """
+        Export the matched orders to an Excel file.
+
+        This function retrieves the matched orders from the order book
+        and exports them to an Excel file using the excel_exporter module.
+        A success message is displayed if the export is successful.
+
+        Raises:
+            Exception: If there is an error retrieving the matched orders
+                       or exporting them to Excel.
+        """
         try:
+            # Retrieve the matched orders from the order book
             matched_orders = self.order_book.get_order_history()
+
+            # Export the matched orders to an Excel file
             result = excel_exporter.export_orders_to_excel(matched_orders)
+
+            # Display a success message with the result
             QMessageBox.information(self, "Export to Excel", result)
         except Exception as e:
+            # Handle any exceptions that occur during the export process
             self.show_error("Failed to export to Excel", str(e))
             logging.error(f"Failed to export to Excel: {e}")
 
@@ -526,48 +557,105 @@ class OrderBookGUI(QMainWindow):
             self.current_prices[self.symbol_input.currentText()] = current_price
 
     def update_statistics(self):
+        """
+        Update the statistics on the GUI.
+
+        This function calculates the total number of buy and sell orders, the average buy price,
+        and the average sell price. It then updates the GUI labels with the corresponding values.
+        """
+        # Calculate the total number of buy and sell orders
         buy_orders = [order for _, _, order in self.order_book.buy_orders]
         sell_orders = [order for _, _, order in self.order_book.sell_orders]
 
         total_buy_orders = len(buy_orders)
         total_sell_orders = len(sell_orders)
-        avg_buy_price = sum(order.price for order in buy_orders) / total_buy_orders if total_buy_orders else 0
-        avg_sell_price = sum(order.price for order in sell_orders) / total_sell_orders if total_sell_orders else 0
 
+        # Calculate the average buy price and average sell price
+        avg_buy_price = (sum(order.price for order in buy_orders) / total_buy_orders
+                         if total_buy_orders else 0)
+        avg_sell_price = (sum(order.price for order in sell_orders) / total_sell_orders
+                          if total_sell_orders else 0)
+
+        # Update the GUI labels with the corresponding values
         self.total_buy_orders_label.setText(str(total_buy_orders))
         self.total_sell_orders_label.setText(str(total_sell_orders))
         self.avg_buy_price_label.setText(f"{avg_buy_price:.2f}")
         self.avg_sell_price_label.setText(f"{avg_sell_price:.2f}")
 
     def update_chart(self):
+        """
+        Update the chart on the GUI with the latest buy and sell orders.
+
+        This function retrieves the latest buy and sell orders from the order book,
+        extracts the prices and quantities of each order, and plots them on the chart.
+        If any error occurs during the process, an error message is displayed and logged.
+        """
         try:
+            # Retrieve the latest buy and sell orders from the order book
             buy_orders = [order for _, _, order in self.order_book.buy_orders]
             sell_orders = [order for _, _, order in self.order_book.sell_orders]
 
+            # Extract the prices and quantities of each order
             buy_prices = [order.price for order in buy_orders]
             buy_quantities = [order.quantity for order in buy_orders]
             sell_prices = [order.price for order in sell_orders]
             sell_quantities = [order.quantity for order in sell_orders]
 
+            # Plot the buy and sell orders on the chart
             self.plot_orders(buy_prices, buy_quantities, sell_prices, sell_quantities)
         except Exception as e:
+            # Display an error message and log the exception
             self.show_error("Failed to update chart", str(e))
             logging.error(f"Failed to update chart: {e}")
 
     def plot_orders(self, buy_prices, buy_quantities, sell_prices, sell_quantities):
+        """
+        Plot the buy and sell orders on the chart.
+
+        Args:
+            buy_prices (List[float]): List of buy order prices.
+            buy_quantities (List[int]): List of buy order quantities.
+            sell_prices (List[float]): List of sell order prices.
+            sell_quantities (List[int]): List of sell order quantities.
+        """
+        # Clear the existing chart
         self.ax.clear()
+
+        # Plot the buy orders
         self.ax.bar(buy_prices, buy_quantities, color='green', label='Buy Orders')
+
+        # Plot the sell orders
         self.ax.bar(sell_prices, sell_quantities, color='red', label='Sell Orders')
+
+        # Set the labels for the x and y axes
         self.ax.set_xlabel('Price')
         self.ax.set_ylabel('Quantity')
+
+        # Set the title for the chart
         self.ax.set_title('Order Distribution')
+
+        # Add a legend to the chart
         self.ax.legend()
+
+        # Update the canvas to display the chart
         self.chart_canvas.draw()
 
     def start_auto_update(self):
+        """
+        Start the auto-update timer.
+
+        This function creates a QTimer object and connects its timeout signal to
+        the update_gui method. The timer is set to update the GUI every 5
+        seconds.
+        """
+        # Create a QTimer object
         timer = QTimer(self)
+
+        # Connect the timeout signal of the timer to the update_gui method
         timer.timeout.connect(self.update_gui)
-        timer.start(5000)  # Update every 5 seconds
+
+        # Start the timer with a timeout interval of 5000 milliseconds (5 seconds)
+        timer.start(5000)
 
     def show_error(self, title, message):
         QMessageBox.critical(self, title, message)
