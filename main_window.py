@@ -104,12 +104,22 @@ class OrderBookGUI(QMainWindow):
         return tree
 
     def create_filter_layout(self, layout):
+        """
+        Create a layout for filter options and apply button.
+
+        Args:
+            layout (QHBoxLayout): The layout to add the filter layout to.
+        """
+        # Create a horizontal layout for the filter options
         filter_layout = QHBoxLayout()
+        
+        # Create input fields for minimum price, maximum price, minimum quantity, and maximum quantity
         self.min_price_input = QLineEdit()
         self.max_price_input = QLineEdit()
         self.min_qty_input = QSpinBox()
         self.max_qty_input = QSpinBox()
         
+        # Add labels and input fields to the filter layout
         filter_layout.addWidget(QLabel("Min Price"))
         filter_layout.addWidget(self.min_price_input)
         filter_layout.addWidget(QLabel("Max Price"))
@@ -119,9 +129,12 @@ class OrderBookGUI(QMainWindow):
         filter_layout.addWidget(QLabel("Max Quantity"))
         filter_layout.addWidget(self.max_qty_input)
         
+        # Create a button to apply the filter
         apply_filter_button = QPushButton("Apply Filter")
         apply_filter_button.clicked.connect(self.apply_filter)
         filter_layout.addWidget(apply_filter_button)
+        
+        # Add the filter layout to the main layout
         layout.addLayout(filter_layout)
 
     def create_statistics_layout(self, layout):
@@ -148,17 +161,23 @@ class OrderBookGUI(QMainWindow):
         layout.addWidget(self.chart_canvas)
 
     def add_random_order(self):
+        """
+        Adds either one buy and one sell order or a random order to the order book.
+        """
         try:
+            # Decide whether to add one buy and one sell order or a random order
             if random.random() <= 0.9:
                 # Generate one buy and one sell order
                 symbol = self.symbol_input.currentText()  # Get the selected symbol
                 current_price = self.current_prices[symbol]
 
+                # Generate a buy order
                 buy_order = generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
                 buy_order.side = "buy"
                 self.order_book.add_order(buy_order)
                 self.order_id_counter += 1
 
+                # Generate a sell order
                 sell_order = generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
                 sell_order.side = "sell"
                 self.order_book.add_order(sell_order)
@@ -174,6 +193,7 @@ class OrderBookGUI(QMainWindow):
 
             self.update_gui()
         except Exception as e:
+            # Handle any exceptions that occur during the order addition process
             self.show_error("Failed to add random order", str(e))
             logging.error(f"Failed to add random order: {e}")
 
@@ -190,15 +210,34 @@ class OrderBookGUI(QMainWindow):
             logging.error(f"Failed to cancel order: {e}")
 
     def match_orders(self):
+        """
+        Match orders in the order book and update the GUI.
+
+        This function attempts to match orders in the order book and logs the
+        result. If no orders are matched, it logs a message saying so.
+        Otherwise, it logs a message for each matched order.
+
+        After matching the orders, it updates the GUI.
+
+        Raises:
+            Exception: If there is an error matching the orders or updating the GUI.
+        """
         try:
+            # Match orders in the order book
             matched = self.order_book.match_orders()
+
+            # If no orders are matched, log a message
             if not matched:
                 logging.info("No orders matched.")
             else:
+                # Log a message for each matched order
                 for buy, sell, qty in matched:
                     logging.info(f"Matched {qty} units between buy order {buy.order_id} and sell order {sell.order_id}")
+
+            # Update the GUI
             self.update_gui()
         except Exception as e:
+            # Handle any exceptions that occur during the order matching process
             self.show_error("Failed to match orders", str(e))
             logging.error(f"Failed to match orders: {e}")
 
@@ -238,21 +277,46 @@ class OrderBookGUI(QMainWindow):
         return generate_realistic_order(f'{self.order_id_counter}', symbol, current_price)
 
     def update_gui(self):
+        """
+        Update the GUI with the current state of the order book.
+
+        This function acquires a lock on the GUI mutex to ensure that no other
+        thread is modifying the GUI at the same time. It then retrieves the
+        current state of the order book using the `get_order_book` method of
+        the `OrderBook` class. It updates the buy and sell trees with the
+        current state of the buy and sell orders. It also updates the stock
+        information, statistics, and chart. Finally, it sets the status label
+        to indicate that the GUI has been updated successfully.
+
+        If any exception occurs during this process, it displays an error
+        message and logs the details of the exception.
+        """
         try:
+            # Acquire the GUI mutex lock to ensure exclusive access to the GUI
             with QMutexLocker(self.mutex):
+                # Retrieve the current state of the order book
                 order_book_state = self.order_book.get_order_book()
 
+                # Update the buy tree with the current state of the buy orders
                 self.update_tree(self.buy_tree, order_book_state['buy_orders'])
+                # Update the sell tree with the current state of the sell orders
                 self.update_tree(self.sell_tree, order_book_state['sell_orders'])
 
+                # Update the stock information
                 self.update_stock_info()
+                # Update the statistics
                 self.update_statistics()
+                # Update the chart
                 self.update_chart()
 
+                # Set the status label to indicate GUI update success
                 self.status_label.setText("Order Book Updated")
+                # Log a success message
                 logging.info("GUI updated successfully")
         except Exception as e:
+            # Display an error message if any exception occurs
             self.show_error("Failed to update GUI", str(e))
+            # Log the details of the exception
             logging.error(f"Failed to update GUI: {e}")
 
     def update_tree(self, tree, orders):
@@ -318,8 +382,29 @@ class OrderBookGUI(QMainWindow):
     def show_error(self, title, message):
         QMessageBox.critical(self, title, message)
 
+# If this script is run directly (i.e., not imported as a module), create a
+# QApplication object and instantiate the OrderBookGUI class.
+# 
+# The QApplication object is necessary to create a GUI application and to
+# handle events. The OrderBookGUI class is the main window of the application.
+# 
+# The show() method is called on the OrderBookGUI instance to display the
+# window. Finally, the exec_() method of the QApplication object is called to
+# start the event loop and run the application.
+# 
+# Note: The if __name__ == "__main__": condition is necessary to prevent the
+# code from being executed when this script is imported as a module in another
+# script.
 if __name__ == "__main__":
+    # Create a QApplication object with the command line arguments
     app = QApplication(sys.argv)
+
+    # Instantiate the OrderBookGUI class
     window = OrderBookGUI()
+
+    # Show the main window
     window.show()
+
+    # Start the event loop and run the application
     sys.exit(app.exec_())
+
