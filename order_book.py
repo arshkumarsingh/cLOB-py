@@ -92,7 +92,11 @@ class OrderBook:
         creates matched orders, logs the match, and returns a list of matched orders.
         """
         matched = []
+        print("Matching orders...")
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
+            print("------------------------------------------------------")
+            print("Current buy order:", self.buy_orders[0])
+            print("Current sell order:", self.sell_orders[0])
             buy_price, _, buy_order = self.buy_orders[0]
             sell_price, _, sell_order = self.sell_orders[0]
 
@@ -115,11 +119,13 @@ class OrderBook:
             if buy_order.quantity:
                 heapq.heappush(self.buy_orders, (-buy_price, buy_order.timestamp, buy_order))
             else:
+                print("Popping buy order...")
                 heapq.heappop(self.buy_orders)
 
             if sell_order.quantity:
                 heapq.heappush(self.sell_orders, (sell_price, sell_order.timestamp, sell_order))
             else:
+                print("Popping sell order...")
                 heapq.heappop(self.sell_orders)
 
             buy_order.execute(0)
@@ -128,6 +134,7 @@ class OrderBook:
             logging.info(f"Matched {matched_quantity} units between buy order {buy_order.order_id} and sell order {sell_order.order_id}")
             matched.append((buy_order, sell_order, matched_quantity))
 
+        print("Order matching complete.")
         return matched
 
     def get_order_book(self):
