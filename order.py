@@ -1,4 +1,3 @@
-import redis
 from datetime import datetime
 
 class Order:

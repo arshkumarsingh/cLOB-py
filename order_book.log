@@ -783,3 +783,275 @@ INFO:root:Matched 5 units between buy order 1 and sell order 20 in 0.0000 second
 2024-06-20 00:31:03,650 Matched orders exported to matched_orders.xlsx.
 2024-06-20 00:31:08,342 GUI updated successfully
 2024-06-20 00:31:13,287 GUI updated successfully
+2024-06-20 16:12:54,145 Added order: Order(timestamp=1718880174145, order_id=1, symbol=AAPL, price=361.8117649365639, quantity=51, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:54,145 Added order: Order(timestamp=1718880174145, order_id=2, symbol=AAPL, price=331.13874845222807, quantity=71, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:54,145 Buy and sell orders added: Order(timestamp=1718880174145, order_id=1, symbol=AAPL, price=361.8117649365639, quantity=51, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880174145, order_id=2, symbol=AAPL, price=331.13874845222807, quantity=71, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:54,214 GUI updated successfully
+2024-06-20 16:12:54,786 Added order: Order(timestamp=1718880174786, order_id=3, symbol=AAPL, price=341.75380571731847, quantity=38, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:54,786 Added order: Order(timestamp=1718880174786, order_id=4, symbol=AAPL, price=351.93515348218494, quantity=37, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:54,786 Buy and sell orders added: Order(timestamp=1718880174786, order_id=3, symbol=AAPL, price=341.75380571731847, quantity=38, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880174786, order_id=4, symbol=AAPL, price=351.93515348218494, quantity=37, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:54,848 GUI updated successfully
+2024-06-20 16:12:55,313 Added order: Order(timestamp=1718880175313, order_id=5, symbol=AAPL, price=350.1974774659518, quantity=24, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:55,313 Added order: Order(timestamp=1718880175313, order_id=6, symbol=AAPL, price=332.4548863930832, quantity=61, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:55,313 Buy and sell orders added: Order(timestamp=1718880175313, order_id=5, symbol=AAPL, price=350.1974774659518, quantity=24, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880175313, order_id=6, symbol=AAPL, price=332.4548863930832, quantity=61, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:55,376 GUI updated successfully
+2024-06-20 16:12:55,839 Added order: Order(timestamp=1718880175838, order_id=7, symbol=AAPL, price=339.60746062626123, quantity=72, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:55,839 Added order: Order(timestamp=1718880175839, order_id=8, symbol=AAPL, price=336.4904919755467, quantity=86, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:55,839 Buy and sell orders added: Order(timestamp=1718880175838, order_id=7, symbol=AAPL, price=339.60746062626123, quantity=72, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880175839, order_id=8, symbol=AAPL, price=336.4904919755467, quantity=86, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:55,924 GUI updated successfully
+2024-06-20 16:12:56,287 GUI updated successfully
+2024-06-20 16:12:57,036 Added order: Order(timestamp=1718880177036, order_id=9, symbol=AAPL, price=330.2955224821092, quantity=73, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,036 Added order: Order(timestamp=1718880177036, order_id=10, symbol=AAPL, price=336.6249231030657, quantity=65, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,036 Buy and sell orders added: Order(timestamp=1718880177036, order_id=9, symbol=AAPL, price=330.2955224821092, quantity=73, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880177036, order_id=10, symbol=AAPL, price=336.6249231030657, quantity=65, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,096 GUI updated successfully
+2024-06-20 16:12:57,696 Added order: Order(timestamp=1718880177696, order_id=11, symbol=AAPL, price=352.78903884510294, quantity=27, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,696 Added order: Order(timestamp=1718880177696, order_id=12, symbol=AAPL, price=341.88375119705586, quantity=5, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,696 Buy and sell orders added: Order(timestamp=1718880177696, order_id=11, symbol=AAPL, price=352.78903884510294, quantity=27, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880177696, order_id=12, symbol=AAPL, price=341.88375119705586, quantity=5, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:57,766 GUI updated successfully
+2024-06-20 16:12:58,423 Added order: Order(timestamp=1718880178423, order_id=13, symbol=AAPL, price=330.9321396276057, quantity=35, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:58,423 Added order: Order(timestamp=1718880178423, order_id=14, symbol=AAPL, price=341.04974694697944, quantity=96, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:58,423 Buy and sell orders added: Order(timestamp=1718880178423, order_id=13, symbol=AAPL, price=330.9321396276057, quantity=35, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880178423, order_id=14, symbol=AAPL, price=341.04974694697944, quantity=96, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:58,494 GUI updated successfully
+2024-06-20 16:12:58,893 Added order: Order(timestamp=1718880178893, order_id=15, symbol=AAPL, price=339.6802794181567, quantity=14, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:58,894 Added order: Order(timestamp=1718880178894, order_id=16, symbol=AAPL, price=329.52163772379754, quantity=33, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:58,894 Buy and sell orders added: Order(timestamp=1718880178893, order_id=15, symbol=AAPL, price=339.6802794181567, quantity=14, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880178894, order_id=16, symbol=AAPL, price=329.52163772379754, quantity=33, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:58,961 GUI updated successfully
+2024-06-20 16:12:59,438 Added order: Order(timestamp=1718880179438, order_id=17, symbol=AAPL, price=331.85121894591606, quantity=84, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:12:59,438 Added order: Order(timestamp=1718880179438, order_id=18, symbol=AAPL, price=359.06950843149036, quantity=6, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:59,438 Buy and sell orders added: Order(timestamp=1718880179438, order_id=17, symbol=AAPL, price=331.85121894591606, quantity=84, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880179438, order_id=18, symbol=AAPL, price=359.06950843149036, quantity=6, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:12:59,507 GUI updated successfully
+2024-06-20 16:13:00,126 Added order: Order(timestamp=1718880180126, order_id=19, symbol=AAPL, price=357.02002857472695, quantity=48, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:00,126 Added order: Order(timestamp=1718880180126, order_id=20, symbol=AAPL, price=353.43318982217863, quantity=92, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:00,126 Buy and sell orders added: Order(timestamp=1718880180126, order_id=19, symbol=AAPL, price=357.02002857472695, quantity=48, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880180126, order_id=20, symbol=AAPL, price=353.43318982217863, quantity=92, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:00,200 GUI updated successfully
+2024-06-20 16:13:01,293 GUI updated successfully
+2024-06-20 16:13:01,422 Matched 33 units between buy order 1 and sell order 16 in 0.0000 seconds
+2024-06-20 16:13:01,422 Matched 18 units between buy order 1 and sell order 2 in 0.0000 seconds
+2024-06-20 16:13:01,422 Matched 48 units between buy order 19 and sell order 2 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 5 units between buy order 11 and sell order 2 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 22 units between buy order 11 and sell order 6 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 24 units between buy order 5 and sell order 6 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 15 units between buy order 3 and sell order 6 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 23 units between buy order 3 and sell order 8 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 14 units between buy order 15 and sell order 8 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 49 units between buy order 7 and sell order 8 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 23 units between buy order 7 and sell order 10 in 0.0000 seconds
+2024-06-20 16:13:01,423 Matched 33 units between buy order 1 and sell order 16
+2024-06-20 16:13:01,423 Matched 18 units between buy order 1 and sell order 2
+2024-06-20 16:13:01,423 Matched 48 units between buy order 19 and sell order 2
+2024-06-20 16:13:01,423 Matched 5 units between buy order 11 and sell order 2
+2024-06-20 16:13:01,423 Matched 22 units between buy order 11 and sell order 6
+2024-06-20 16:13:01,423 Matched 24 units between buy order 5 and sell order 6
+2024-06-20 16:13:01,423 Matched 15 units between buy order 3 and sell order 6
+2024-06-20 16:13:01,423 Matched 23 units between buy order 3 and sell order 8
+2024-06-20 16:13:01,423 Matched 14 units between buy order 15 and sell order 8
+2024-06-20 16:13:01,423 Matched 49 units between buy order 7 and sell order 8
+2024-06-20 16:13:01,423 Matched 23 units between buy order 7 and sell order 10
+2024-06-20 16:13:01,486 GUI updated successfully
+2024-06-20 16:13:02,083 No orders matched.
+2024-06-20 16:13:02,156 GUI updated successfully
+2024-06-20 16:13:03,114 Matched orders exported to matched_orders.xlsx.
+2024-06-20 16:13:06,291 GUI updated successfully
+2024-06-20 16:13:11,302 GUI updated successfully
+2024-06-20 16:13:16,333 GUI updated successfully
+2024-06-20 16:13:21,287 GUI updated successfully
+2024-06-20 16:13:24,186 No orders matched.
+2024-06-20 16:13:24,247 GUI updated successfully
+2024-06-20 16:13:24,702 Added order: Order(timestamp=1718880204701, order_id=21, symbol=AAPL, price=332.50669938364587, quantity=3, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:24,702 Added order: Order(timestamp=1718880204702, order_id=22, symbol=AAPL, price=331.0589282026079, quantity=16, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:24,702 Buy and sell orders added: Order(timestamp=1718880204701, order_id=21, symbol=AAPL, price=332.50669938364587, quantity=3, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880204702, order_id=22, symbol=AAPL, price=331.0589282026079, quantity=16, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:24,765 GUI updated successfully
+2024-06-20 16:13:24,919 Added order: Order(timestamp=1718880204919, order_id=23, symbol=AAPL, price=331.23468903363596, quantity=4, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:24,919 Random order added: Order(timestamp=1718880204919, order_id=23, symbol=AAPL, price=331.23468903363596, quantity=4, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:24,985 GUI updated successfully
+2024-06-20 16:13:25,191 Added order: Order(timestamp=1718880205191, order_id=24, symbol=AAPL, price=338.8823636837352, quantity=5, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:25,191 Added order: Order(timestamp=1718880205191, order_id=25, symbol=AAPL, price=330.17828726578716, quantity=17, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:25,191 Buy and sell orders added: Order(timestamp=1718880205191, order_id=24, symbol=AAPL, price=338.8823636837352, quantity=5, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880205191, order_id=25, symbol=AAPL, price=330.17828726578716, quantity=17, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:25,256 GUI updated successfully
+2024-06-20 16:13:25,553 Added order: Order(timestamp=1718880205553, order_id=26, symbol=AAPL, price=342.26464337798893, quantity=54, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:25,553 Random order added: Order(timestamp=1718880205553, order_id=26, symbol=AAPL, price=342.26464337798893, quantity=54, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:25,621 GUI updated successfully
+2024-06-20 16:13:26,192 Matched 5 units between buy order 24 and sell order 25 in 0.0000 seconds
+2024-06-20 16:13:26,192 Matched 3 units between buy order 21 and sell order 25 in 0.0000 seconds
+2024-06-20 16:13:26,192 Matched 9 units between buy order 17 and sell order 25 in 0.0000 seconds
+2024-06-20 16:13:26,192 Matched 16 units between buy order 17 and sell order 22 in 0.0000 seconds
+2024-06-20 16:13:26,192 Matched 5 units between buy order 24 and sell order 25
+2024-06-20 16:13:26,192 Matched 3 units between buy order 21 and sell order 25
+2024-06-20 16:13:26,192 Matched 9 units between buy order 17 and sell order 25
+2024-06-20 16:13:26,192 Matched 16 units between buy order 17 and sell order 22
+2024-06-20 16:13:26,257 GUI updated successfully
+2024-06-20 16:13:26,326 GUI updated successfully
+2024-06-20 16:13:27,734 Added order: Order(timestamp=1718880207734, order_id=27, symbol=AAPL, price=332.91222569087967, quantity=33, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:27,734 Added order: Order(timestamp=1718880207734, order_id=28, symbol=AAPL, price=322.9681997397389, quantity=34, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:27,734 Buy and sell orders added: Order(timestamp=1718880207734, order_id=27, symbol=AAPL, price=332.91222569087967, quantity=33, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880207734, order_id=28, symbol=AAPL, price=322.9681997397389, quantity=34, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:27,808 GUI updated successfully
+2024-06-20 16:13:27,905 Added order: Order(timestamp=1718880207905, order_id=29, symbol=AAPL, price=344.5053930661074, quantity=4, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:27,905 Random order added: Order(timestamp=1718880207905, order_id=29, symbol=AAPL, price=344.5053930661074, quantity=4, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:27,974 GUI updated successfully
+2024-06-20 16:13:28,096 Added order: Order(timestamp=1718880208095, order_id=30, symbol=AAPL, price=324.6888899243142, quantity=13, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,096 Added order: Order(timestamp=1718880208096, order_id=31, symbol=AAPL, price=337.81622044030155, quantity=94, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,096 Buy and sell orders added: Order(timestamp=1718880208095, order_id=30, symbol=AAPL, price=324.6888899243142, quantity=13, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880208096, order_id=31, symbol=AAPL, price=337.81622044030155, quantity=94, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,165 GUI updated successfully
+2024-06-20 16:13:28,256 Added order: Order(timestamp=1718880208256, order_id=32, symbol=AAPL, price=337.9522752972637, quantity=73, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,257 Added order: Order(timestamp=1718880208257, order_id=33, symbol=AAPL, price=339.35128888100576, quantity=42, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,257 Buy and sell orders added: Order(timestamp=1718880208256, order_id=32, symbol=AAPL, price=337.9522752972637, quantity=73, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880208257, order_id=33, symbol=AAPL, price=339.35128888100576, quantity=42, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,336 GUI updated successfully
+2024-06-20 16:13:28,449 Added order: Order(timestamp=1718880208449, order_id=34, symbol=AAPL, price=335.20721232069695, quantity=58, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,449 Added order: Order(timestamp=1718880208449, order_id=35, symbol=AAPL, price=331.2148184709859, quantity=86, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,449 Buy and sell orders added: Order(timestamp=1718880208449, order_id=34, symbol=AAPL, price=335.20721232069695, quantity=58, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880208449, order_id=35, symbol=AAPL, price=331.2148184709859, quantity=86, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,521 GUI updated successfully
+2024-06-20 16:13:28,647 Added order: Order(timestamp=1718880208647, order_id=36, symbol=AAPL, price=342.2798178356437, quantity=94, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,647 Added order: Order(timestamp=1718880208647, order_id=37, symbol=AAPL, price=320.20022072685725, quantity=22, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,647 Buy and sell orders added: Order(timestamp=1718880208647, order_id=36, symbol=AAPL, price=342.2798178356437, quantity=94, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880208647, order_id=37, symbol=AAPL, price=320.20022072685725, quantity=22, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,755 GUI updated successfully
+2024-06-20 16:13:28,845 Added order: Order(timestamp=1718880208845, order_id=38, symbol=AAPL, price=333.3217028268183, quantity=51, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:28,845 Added order: Order(timestamp=1718880208845, order_id=39, symbol=AAPL, price=346.2135956073001, quantity=49, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,845 Buy and sell orders added: Order(timestamp=1718880208845, order_id=38, symbol=AAPL, price=333.3217028268183, quantity=51, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880208845, order_id=39, symbol=AAPL, price=346.2135956073001, quantity=49, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:28,922 GUI updated successfully
+2024-06-20 16:13:29,279 Added order: Order(timestamp=1718880209279, order_id=40, symbol=AAPL, price=339.4486002366536, quantity=48, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:29,279 Added order: Order(timestamp=1718880209279, order_id=41, symbol=AAPL, price=334.76386531621347, quantity=12, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:29,280 Buy and sell orders added: Order(timestamp=1718880209279, order_id=40, symbol=AAPL, price=339.4486002366536, quantity=48, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880209279, order_id=41, symbol=AAPL, price=334.76386531621347, quantity=12, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:29,357 GUI updated successfully
+2024-06-20 16:13:29,479 Added order: Order(timestamp=1718880209479, order_id=42, symbol=AAPL, price=318.2696845468943, quantity=81, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:29,479 Added order: Order(timestamp=1718880209479, order_id=43, symbol=AAPL, price=338.86679499293683, quantity=81, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:29,479 Buy and sell orders added: Order(timestamp=1718880209479, order_id=42, symbol=AAPL, price=318.2696845468943, quantity=81, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880209479, order_id=43, symbol=AAPL, price=338.86679499293683, quantity=81, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:29,553 GUI updated successfully
+2024-06-20 16:13:29,929 Matched 22 units between buy order 36 and sell order 37 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 34 units between buy order 36 and sell order 28 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 38 units between buy order 36 and sell order 35 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 48 units between buy order 40 and sell order 35 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 12 units between buy order 32 and sell order 41 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 42 units between buy order 32 and sell order 10 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 19 units between buy order 32 and sell order 31 in 0.0000 seconds
+2024-06-20 16:13:29,930 Matched 22 units between buy order 36 and sell order 37
+2024-06-20 16:13:29,930 Matched 34 units between buy order 36 and sell order 28
+2024-06-20 16:13:29,930 Matched 38 units between buy order 36 and sell order 35
+2024-06-20 16:13:29,930 Matched 48 units between buy order 40 and sell order 35
+2024-06-20 16:13:29,930 Matched 12 units between buy order 32 and sell order 41
+2024-06-20 16:13:29,930 Matched 42 units between buy order 32 and sell order 10
+2024-06-20 16:13:29,930 Matched 19 units between buy order 32 and sell order 31
+2024-06-20 16:13:30,000 GUI updated successfully
+2024-06-20 16:13:30,264 No orders matched.
+2024-06-20 16:13:30,332 GUI updated successfully
+2024-06-20 16:13:30,624 No orders matched.
+2024-06-20 16:13:30,692 GUI updated successfully
+2024-06-20 16:13:31,003 No orders matched.
+2024-06-20 16:13:31,072 GUI updated successfully
+2024-06-20 16:13:31,290 GUI updated successfully
+2024-06-20 16:13:31,301 No orders matched.
+2024-06-20 16:13:31,371 GUI updated successfully
+2024-06-20 16:13:31,789 No orders matched.
+2024-06-20 16:13:31,856 GUI updated successfully
+2024-06-20 16:13:32,059 No orders matched.
+2024-06-20 16:13:32,130 GUI updated successfully
+2024-06-20 16:13:32,545 Added order: Order(timestamp=1718880212545, order_id=44, symbol=AAPL, price=328.31519980377533, quantity=97, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:32,545 Added order: Order(timestamp=1718880212545, order_id=45, symbol=AAPL, price=331.3956670089368, quantity=77, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:32,545 Buy and sell orders added: Order(timestamp=1718880212545, order_id=44, symbol=AAPL, price=328.31519980377533, quantity=97, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880212545, order_id=45, symbol=AAPL, price=331.3956670089368, quantity=77, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:32,621 GUI updated successfully
+2024-06-20 16:13:32,734 Added order: Order(timestamp=1718880212734, order_id=46, symbol=AAPL, price=350.11269499643157, quantity=17, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:32,734 Added order: Order(timestamp=1718880212734, order_id=47, symbol=AAPL, price=322.846047965646, quantity=33, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:32,734 Buy and sell orders added: Order(timestamp=1718880212734, order_id=46, symbol=AAPL, price=350.11269499643157, quantity=17, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880212734, order_id=47, symbol=AAPL, price=322.846047965646, quantity=33, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:32,806 GUI updated successfully
+2024-06-20 16:13:32,943 Added order: Order(timestamp=1718880212943, order_id=48, symbol=AAPL, price=329.0194782195723, quantity=64, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:32,943 Added order: Order(timestamp=1718880212943, order_id=49, symbol=AAPL, price=334.00659242964383, quantity=80, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:32,943 Buy and sell orders added: Order(timestamp=1718880212943, order_id=48, symbol=AAPL, price=329.0194782195723, quantity=64, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880212943, order_id=49, symbol=AAPL, price=334.00659242964383, quantity=80, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,016 GUI updated successfully
+2024-06-20 16:13:33,132 Added order: Order(timestamp=1718880213132, order_id=50, symbol=AAPL, price=323.3516665383201, quantity=38, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,132 Added order: Order(timestamp=1718880213132, order_id=51, symbol=AAPL, price=354.6240232584015, quantity=44, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:33,132 Buy and sell orders added: Order(timestamp=1718880213132, order_id=50, symbol=AAPL, price=323.3516665383201, quantity=38, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880213132, order_id=51, symbol=AAPL, price=354.6240232584015, quantity=44, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:33,206 GUI updated successfully
+2024-06-20 16:13:33,331 Added order: Order(timestamp=1718880213331, order_id=52, symbol=AAPL, price=348.92410252838414, quantity=89, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,331 Added order: Order(timestamp=1718880213331, order_id=53, symbol=AAPL, price=327.1190566605526, quantity=55, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,331 Buy and sell orders added: Order(timestamp=1718880213331, order_id=52, symbol=AAPL, price=348.92410252838414, quantity=89, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880213331, order_id=53, symbol=AAPL, price=327.1190566605526, quantity=55, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,408 GUI updated successfully
+2024-06-20 16:13:33,519 Added order: Order(timestamp=1718880213519, order_id=54, symbol=AAPL, price=349.67697982881674, quantity=97, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:33,520 Added order: Order(timestamp=1718880213520, order_id=55, symbol=AAPL, price=352.8505492476035, quantity=70, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:33,520 Buy and sell orders added: Order(timestamp=1718880213519, order_id=54, symbol=AAPL, price=349.67697982881674, quantity=97, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880213520, order_id=55, symbol=AAPL, price=352.8505492476035, quantity=70, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:33,599 GUI updated successfully
+2024-06-20 16:13:33,692 Added order: Order(timestamp=1718880213692, order_id=56, symbol=AAPL, price=341.1262204487609, quantity=54, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,693 Random order added: Order(timestamp=1718880213692, order_id=56, symbol=AAPL, price=341.1262204487609, quantity=54, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:33,781 GUI updated successfully
+2024-06-20 16:13:35,114 Matched 17 units between buy order 46 and sell order 47 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 16 units between buy order 54 and sell order 47 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 55 units between buy order 54 and sell order 53 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 26 units between buy order 54 and sell order 45 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 51 units between buy order 52 and sell order 45 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 38 units between buy order 52 and sell order 49 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 42 units between buy order 56 and sell order 49 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 12 units between buy order 56 and sell order 31 in 0.0000 seconds
+2024-06-20 16:13:35,115 Matched 17 units between buy order 46 and sell order 47
+2024-06-20 16:13:35,115 Matched 16 units between buy order 54 and sell order 47
+2024-06-20 16:13:35,115 Matched 55 units between buy order 54 and sell order 53
+2024-06-20 16:13:35,115 Matched 26 units between buy order 54 and sell order 45
+2024-06-20 16:13:35,115 Matched 51 units between buy order 52 and sell order 45
+2024-06-20 16:13:35,115 Matched 38 units between buy order 52 and sell order 49
+2024-06-20 16:13:35,115 Matched 42 units between buy order 56 and sell order 49
+2024-06-20 16:13:35,115 Matched 12 units between buy order 56 and sell order 31
+2024-06-20 16:13:35,187 GUI updated successfully
+2024-06-20 16:13:35,309 No orders matched.
+2024-06-20 16:13:35,384 GUI updated successfully
+2024-06-20 16:13:35,568 No orders matched.
+2024-06-20 16:13:35,644 GUI updated successfully
+2024-06-20 16:13:35,802 No orders matched.
+2024-06-20 16:13:35,874 GUI updated successfully
+2024-06-20 16:13:36,306 GUI updated successfully
+2024-06-20 16:13:36,319 Added order: Order(timestamp=1718880216319, order_id=57, symbol=AAPL, price=349.39264345224, quantity=12, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:36,319 Added order: Order(timestamp=1718880216319, order_id=58, symbol=AAPL, price=332.6440784898084, quantity=94, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:36,319 Buy and sell orders added: Order(timestamp=1718880216319, order_id=57, symbol=AAPL, price=349.39264345224, quantity=12, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880216319, order_id=58, symbol=AAPL, price=332.6440784898084, quantity=94, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:36,396 GUI updated successfully
+2024-06-20 16:13:36,682 Matched 12 units between buy order 57 and sell order 58 in 0.0000 seconds
+2024-06-20 16:13:36,682 Matched 58 units between buy order 34 and sell order 58 in 0.0000 seconds
+2024-06-20 16:13:36,682 Matched 24 units between buy order 38 and sell order 58 in 0.0000 seconds
+2024-06-20 16:13:36,682 Matched 12 units between buy order 57 and sell order 58
+2024-06-20 16:13:36,682 Matched 58 units between buy order 34 and sell order 58
+2024-06-20 16:13:36,683 Matched 24 units between buy order 38 and sell order 58
+2024-06-20 16:13:36,787 GUI updated successfully
+2024-06-20 16:13:37,168 Added order: Order(timestamp=1718880217168, order_id=59, symbol=AAPL, price=327.46142204009004, quantity=92, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:37,168 Added order: Order(timestamp=1718880217168, order_id=60, symbol=AAPL, price=332.68796076670236, quantity=39, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:37,168 Buy and sell orders added: Order(timestamp=1718880217168, order_id=59, symbol=AAPL, price=327.46142204009004, quantity=92, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880217168, order_id=60, symbol=AAPL, price=332.68796076670236, quantity=39, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:37,241 GUI updated successfully
+2024-06-20 16:13:37,582 Matched 27 units between buy order 38 and sell order 60 in 0.0000 seconds
+2024-06-20 16:13:37,582 Matched 12 units between buy order 27 and sell order 60 in 0.0000 seconds
+2024-06-20 16:13:37,582 Matched 27 units between buy order 38 and sell order 60
+2024-06-20 16:13:37,582 Matched 12 units between buy order 27 and sell order 60
+2024-06-20 16:13:37,654 GUI updated successfully
+2024-06-20 16:13:37,951 No orders matched.
+2024-06-20 16:13:38,022 GUI updated successfully
+2024-06-20 16:13:38,464 Added order: Order(timestamp=1718880218464, order_id=61, symbol=AAPL, price=338.63109584820376, quantity=52, side=buy, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:38,464 Added order: Order(timestamp=1718880218464, order_id=62, symbol=AAPL, price=331.92361169726803, quantity=91, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:38,464 Buy and sell orders added: Order(timestamp=1718880218464, order_id=61, symbol=AAPL, price=338.63109584820376, quantity=52, side=buy, order_type=limit, execution_time=None, status=pending), Order(timestamp=1718880218464, order_id=62, symbol=AAPL, price=331.92361169726803, quantity=91, side=sell, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:38,537 GUI updated successfully
+2024-06-20 16:13:38,689 Added order: Order(timestamp=1718880218689, order_id=63, symbol=AAPL, price=344.104188939772, quantity=36, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:38,689 Random order added: Order(timestamp=1718880218689, order_id=63, symbol=AAPL, price=344.104188939772, quantity=36, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:38,761 GUI updated successfully
+2024-06-20 16:13:38,886 Added order: Order(timestamp=1718880218886, order_id=64, symbol=AAPL, price=317.3237878384276, quantity=62, side=buy, order_type=market, execution_time=None, status=pending)
+2024-06-20 16:13:38,887 Added order: Order(timestamp=1718880218887, order_id=65, symbol=AAPL, price=317.49267983199195, quantity=13, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:38,887 Buy and sell orders added: Order(timestamp=1718880218886, order_id=64, symbol=AAPL, price=317.3237878384276, quantity=62, side=buy, order_type=market, execution_time=None, status=pending), Order(timestamp=1718880218887, order_id=65, symbol=AAPL, price=317.49267983199195, quantity=13, side=sell, order_type=limit, execution_time=None, status=pending)
+2024-06-20 16:13:38,962 GUI updated successfully
+2024-06-20 16:13:40,749 Matched 13 units between buy order 61 and sell order 65 in 0.0000 seconds
+2024-06-20 16:13:40,749 Matched 39 units between buy order 61 and sell order 62 in 0.0000 seconds
+2024-06-20 16:13:40,749 Matched 21 units between buy order 27 and sell order 62 in 0.0000 seconds
+2024-06-20 16:13:40,749 Matched 13 units between buy order 61 and sell order 65
+2024-06-20 16:13:40,749 Matched 39 units between buy order 61 and sell order 62
+2024-06-20 16:13:40,749 Matched 21 units between buy order 27 and sell order 62
+2024-06-20 16:13:40,821 GUI updated successfully
+2024-06-20 16:13:41,305 GUI updated successfully
+2024-06-20 16:13:41,792 No orders matched.
+2024-06-20 16:13:41,865 GUI updated successfully
+2024-06-20 16:13:42,288 No orders matched.
+2024-06-20 16:13:42,359 GUI updated successfully
+2024-06-20 16:13:42,505 No orders matched.
+2024-06-20 16:13:42,578 GUI updated successfully
+2024-06-20 16:13:42,981 No orders matched.
+2024-06-20 16:13:43,055 GUI updated successfully
+2024-06-20 16:13:43,279 No orders matched.
+2024-06-20 16:13:43,360 GUI updated successfully
+2024-06-20 16:13:43,837 No orders matched.
+2024-06-20 16:13:43,911 GUI updated successfully
+2024-06-20 16:13:44,144 No orders matched.
+2024-06-20 16:13:44,264 GUI updated successfully
+2024-06-20 16:13:46,296 GUI updated successfully
+2024-06-20 16:13:51,299 GUI updated successfully
+2024-06-20 16:13:56,305 GUI updated successfully
+2024-06-20 16:14:01,299 GUI updated successfully
+2024-06-20 16:14:06,308 GUI updated successfully
