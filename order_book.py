@@ -13,44 +13,64 @@ class OrderBook:
         Initializes a new instance of the OrderBook class.
 
         This constructor initializes the following attributes:
-        - buy_orders: a list to store buy orders
-        - sell_orders: a list to store sell orders
-        - order_history: a deque to store the history of orders
-        - last_matched_price: a variable to store the last matched price
-        - users: a list to store users
-        - current_user: a variable to store the current user
 
-        It also sets up logging with a filename 'order_book.log', level INFO, and a format of '%(asctime)s %(message)s'.
+        - buy_orders: A list to store buy orders.
+        - sell_orders: A list to store sell orders.
+        - order_history: A deque to store the history of orders.
+        - last_matched_price: A variable to store the last matched price.
+        - users: A list to store users.
+        - current_user: A variable to store the current user.
+
+        It also sets up logging with a filename 'order_book.log', level INFO,
+        and a format of '%(asctime)s %(message)s'.
+
         """
-        self.buy_orders = []
-        self.sell_orders = []
-        self.order_history = deque()
-        self.last_matched_price = None
-        self.users = []
-        self.current_user = None
-        logging.basicConfig(filename='order_book.log', level=logging.INFO, format='%(asctime)s %(message)s')
+        # Initialize attributes
+        self.buy_orders = []  # List to store buy orders
+        self.sell_orders = []  # List to store sell orders
+        self.order_history = deque()  # Deque to store the history of orders
+        self.last_matched_price = None  # Variable to store the last matched price
+        self.users = []  # List to store users
+        self.current_user = None  # Variable to store the current user
+
+        # Set up logging
+        logging.basicConfig(
+            filename='order_book.log',
+            level=logging.INFO,
+            format='%(asctime)s %(message)s'
+        )
 
     def add_order(self, order):
         """
         Adds the given order to the order book.
-        
-        Parameters:
-            order: Order - the order to be added to the order book
-        
+
+        Args:
+            order (Order): The order to be added to the order book.
+
         Raises:
-            Exception: If there is an error adding the order
-        
+            Exception: If there is an error adding the order.
+
         Returns:
             None
         """
         try:
+            # Validate the order before adding it to the order book.
             self.validate_order(order)
+
+            # Determine the heap to push the order into based on the order side.
             if order.side == "buy":
-                heapq.heappush(self.buy_orders, (-order.price, order.timestamp, order))
+                heap = self.buy_orders
             else:
-                heapq.heappush(self.sell_orders, (order.price, order.timestamp, order))
+                heap = self.sell_orders
+
+            # Push the order into the heap with the price and timestamp as the key.
+            heapq.heappush(heap, (order.price, order.timestamp, order))
+
+            # Log the successful addition of the order.
             logging.info(f"Added order: {order}")
+
         except Exception as e:
+            # Log the error caused by failure to add the order.
             logging.error(f"Error adding order: {order}. Error: {str(e)}")
             raise
 
@@ -76,14 +96,28 @@ class OrderBook:
             >>> order_book.cancel_order("2")
             "Order 2 not found."
         """
+        # Iterate over the buy and sell order lists
         for order_list in [self.buy_orders, self.sell_orders]:
+            # Iterate over the orders in the order list
             for index, (_, _, order) in enumerate(order_list):
+                # Check if the order ID matches the given order ID
                 if order.order_id == order_id:
+                    # Cancel the order
                     order.cancel()
+
+                    # Remove the order from the order list
                     order_list.pop(index)
+
+                    # Rebuild the heap to maintain the heap property
                     heapq.heapify(order_list)
+
+                    # Log the cancellation of the order
                     logging.info(f"Order {order_id} cancelled.")
+
+                    # Return a success message
                     return f"Order {order_id} cancelled."
+
+        # If the order is not found, log a warning and return an error message
         logging.warning(f"Order {order_id} not found.")
         return f"Order {order_id} not found."
 
@@ -92,22 +126,34 @@ class OrderBook:
         Matches buy and sell orders based on quantity and price, updates order quantities,
         creates matched orders, logs the match, and returns a list of matched orders.
 
-        :return: A list of tuples containing the matched orders, their quantities,
-                 and the timestamp of the match.
-        :rtype: List[Tuple[Order, Order, int]]
+        Returns:
+            A list of tuples containing the matched orders, their quantities,
+            and the timestamp of the match.
         """
+        # Initialize an empty list to store the matched orders
         matched: List[Tuple[Order, Order, int]] = []
 
+        # Print a starting message
         print("Starting order matching...")
+
+        # Continue matching orders until there are no more buy or sell orders,
+        # or the best buy order's price is greater than the best sell order's price
         while self.buy_orders and self.sell_orders and -self.buy_orders[0][0] >= self.sell_orders[0][0]:
+            # Print a message for each iteration
             print("Matching orders...")
+
+            # Get the first buy and sell orders
             buy_price, _, buy_order = self.buy_orders[0]
             sell_price, _, sell_order = self.sell_orders[0]
 
+            # Calculate the quantity to match between the buy and sell orders
             matched_quantity = min(buy_order.quantity, sell_order.quantity)
+
+            # Update the quantities of the buy and sell orders
             buy_order.quantity -= matched_quantity
             sell_order.quantity -= matched_quantity
 
+            # Create a dictionary to represent the matched order
             matched_order = {
                 "buy_order_id": str(buy_order.order_id),
                 "sell_order_id": str(sell_order.order_id),
@@ -117,30 +163,46 @@ class OrderBook:
                 "timestamp": int(time.time()),
             }
 
+            # Add the matched order to the order history
             self.order_history.appendleft(matched_order)
+
+            # Update the last matched price
             self.last_matched_price = sell_price
 
+            # If the buy order has remaining quantity, push it back into the buy orders heap
             if buy_order.quantity:
                 heapq.heappush(self.buy_orders, (-buy_price, buy_order.timestamp, buy_order))
+            # Otherwise, remove the buy order from the heap
             else:
                 heapq.heappop(self.buy_orders)
 
+            # If the sell order has remaining quantity, push it back into the sell orders heap
             if sell_order.quantity:
                 heapq.heappush(self.sell_orders, (sell_price, sell_order.timestamp, sell_order))
+            # Otherwise, remove the sell order from the heap
             else:
                 heapq.heappop(self.sell_orders)
 
+            # Execute the buy and sell orders
             buy_order.execute(0)
             sell_order.execute(0)
 
+            # Log the match
             logging.info(
                 f"Matched {matched_quantity} units between buy order {buy_order.order_id}"
                 f" and sell order {sell_order.order_id}"
             )
+
+            # Add the matched order to the list of matched orders
             matched.append((buy_order, sell_order, matched_quantity))
+
+            # Print a message for each iteration
             print("Orders matched.")
 
+        # Print a completion message
         print("Order matching completed.")
+
+        # Return the list of matched orders
         return matched
 
     def get_order_book(self) -> Dict[str, List[Order]]:
@@ -184,12 +246,29 @@ class OrderBook:
         logging.info(f"User added: {user}")
 
     def authenticate_user(self, username, password):
+        """
+        Authenticates a user with the given username and password.
+
+        Args:
+            username (str): The username of the user.
+            password (str): The password of the user.
+
+        Returns:
+            bool: True if the user is authenticated successfully, False otherwise.
+        """
+        # Iterate through the list of users
         for user in self.users:
+            # Check if the username and password match
             if user.username == username and user.check_password(password):
+                # Set the current user to the authenticated user
                 self.current_user = user
+                # Log the successful authentication
                 logging.info(f"User authenticated: {user}")
+                # Return True to indicate successful authentication
                 return True
+        # Log the failed authentication attempt
         logging.warning(f"Authentication failed for user: {username}")
+        # Return False to indicate failed authentication
         return False
 
     def get_current_user_role(self):
@@ -214,6 +293,10 @@ def generate_realistic_order(order_id, symbol, current_price):
     """
     Generates a realistic order with randomized attributes.
 
+    This function generates a random order with a unique order ID, a symbol, 
+    a current price, a side (either "buy" or "sell"), a price, a quantity, 
+    an order type (either "limit" or "market"), and a timestamp.
+
     Args:
         order_id (str): The unique identifier for the order.
         symbol (str): The symbol for which the order is placed.
@@ -222,9 +305,20 @@ def generate_realistic_order(order_id, symbol, current_price):
     Returns:
         Order: An instance of the Order class representing the generated order.
     """
+    # Generate a random side of the order ("buy" or "sell")
     side = random.choice(["buy", "sell"])
+
+    # Generate a random price for the order within 5% of the current price
     price = current_price * random.uniform(0.95, 1.05)
+
+    # Generate a random quantity for the order between 1 and 100
     quantity = random.randint(1, 100)
+
+    # Generate a random order type ("limit" or "market")
     order_type = random.choice(["limit", "market"])
+
+    # Generate a timestamp for the order using the current time in milliseconds
     timestamp = int(time.time() * 1000)
+
+    # Create and return a new instance of the Order class with the generated attributes
     return Order(timestamp, order_id, symbol, price, quantity, side, order_type)
